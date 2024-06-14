@@ -1,0 +1,1431 @@
+Disassembly Listing for proyectobase4
+Generated From:
+/home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/dist/default/production/proyectobase4.X.production.cof
+12/03/2014 09:09:35
+
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/main.c  -------
+1:                 
+2:                 /**********************************************************************
+3:                  FileName:        main.c
+4:                  Dependencies:    p33FJ256GP710.h
+5:                  Processor:       dsPIC33F
+6:                  Compiler:        MPLAB® C30 v2.01 or higher
+7:                 
+8:                  Ejemplo de funcionamiento de:
+9:                  	Timer1
+10:                 	LCD
+11:                 	PORT A Output
+12:                 	PORT D Input
+13:                
+14:                 REVISION HISTORY:
+15:                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+16:                 Author            Date      Comments on this revision
+17:                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+18:                 Richard Fischer   07/14/05  Initial Release
+19:                 Priyabrata Sinha  01/27/06  Ported to non-prototype devices 
+20:                 Ricardo López     05/24/10  Adaptación para uso general
+21:                 Sebastián Wahler  08/05/13  Nuevas adaptaciones
+22:                 Marcelo Gómez     09/03/14  Portado a MPLAB.X
+23:                
+24:                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+25:                **********************************************************************/
+26:                #include "common.h"
+27:                #include <xc.h>
+28:                #include "confbits.h"
+29:                #include "p33FJ256GP710.h"
+30:                #include "lcd.h"
+31:                #include "config.h"
+32:                
+33:                const char mytext[] =   "TP4      AC 2014";  //Largo 16 chars
+34:                const char mytext1[] =  "Pulsar S3       ";
+35:                const char time_msg[] = "00:00:00        ";
+36:                int counterTog = 0;
+37:                
+38:                void ToggleTest (void)
+39:                {
+40:                			__builtin_btg((unsigned int *)&LATA, 7);
+0006BA  202C44     MOV #0x2C4, W4
+0006BC  A27014     BTG [W4], #7
+41:                			__builtin_btg((unsigned int *)&LATA, 6);
+0006BE  202C44     MOV #0x2C4, W4
+0006C0  A26014     BTG [W4], #6
+42:                			__builtin_btg((unsigned int *)&LATA, 5);
+0006C2  202C44     MOV #0x2C4, W4
+0006C4  A25014     BTG [W4], #5
+43:                			__builtin_btg((unsigned int *)&LATA, 4);
+0006C6  202C44     MOV #0x2C4, W4
+0006C8  A24014     BTG [W4], #4
+44:                			__builtin_btg((unsigned int *)&LATA, 3);
+0006CA  202C44     MOV #0x2C4, W4
+0006CC  A23014     BTG [W4], #3
+45:                			__builtin_btg((unsigned int *)&LATA, 2);	
+0006CE  202C44     MOV #0x2C4, W4
+0006D0  A22014     BTG [W4], #2
+46:                			__builtin_btg((unsigned int *)&LATA, 1);
+0006D2  202C44     MOV #0x2C4, W4
+0006D4  A21014     BTG [W4], #1
+47:                			__builtin_btg((unsigned int *)&LATA, 0);
+0006D6  202C44     MOV #0x2C4, W4
+0006D8  A20014     BTG [W4], #0
+48:                			counterTog = 0;
+0006DA  EB0200     CLR W4
+0006DC  8840C4     MOV W4, counterTog
+49:                }
+0006E2  FA0000     LNK #0x0
+50:                
+51:                int main ( void )
+52:                {
+53:                   	config();
+0006E4  07005B     RCALL config
+54:                
+55:                #ifdef USAR_LCD
+56:                	/* Mensaje Inicial */
+57:                	home_clr();
+0006E6  B3C010     MOV #0x1, W0
+0006E8  07FF78     RCALL lcd_cmd
+58:                	puts_lcd( (unsigned char*) &mytext[0], sizeof(mytext) -1 );
+0006EA  284B44     MOV #0x84B4, W4
+0006EC  B3C101     MOV #0x10, W1
+0006EE  780004     MOV W4, W0
+0006F0  07FFA1     RCALL puts_lcd
+59:                	line_2();
+0006F2  B3CC00     MOV #0xC0, W0
+0006F4  07FF72     RCALL lcd_cmd
+60:                	puts_lcd( (unsigned char*) &mytext1[0], sizeof(mytext1) -1 );
+0006F6  284C54     MOV #0x84C5, W4
+0006F8  B3C101     MOV #0x10, W1
+0006FA  780004     MOV W4, W0
+0006FC  07FF9B     RCALL puts_lcd
+61:                #endif // USAR_LCD
+62:                
+63:                	/* Espera hasta que el switch S3 es presionado (se haga 1) */
+64:                	while ( PORTDbits.RD6 )
+0006FE  000000     NOP
+000700  8016A5     MOV PORTD, W5
+000702  200404     MOV #0x40, W4
+000704  628204     AND W5, W4, W4
+000706  520FE0     SUB W4, #0x0, [W15]
+000708  3AFFFB     BRA NZ, 0x700
+65:                		;
+66:                
+67:                #ifdef USAR_LCD
+68:                	/* Nuevo mensaje al LCD */
+69:                	home_clr();
+00070A  B3C010     MOV #0x1, W0
+00070C  07FF66     RCALL lcd_cmd
+70:                	puts_lcd( (unsigned char*) &time_msg[0], sizeof(time_msg) -1 );
+00070E  284D64     MOV #0x84D6, W4
+000710  B3C101     MOV #0x10, W1
+000712  780004     MOV W4, W0
+000714  07FF8F     RCALL puts_lcd
+000716  370001     BRA 0x71A
+71:                #endif // USAR_LCD
+72:                
+73:                	 /* Loop infinito */
+74:                    while ( 1 ) 
+75:                    { 
+76:                	  //Testigo: Toggle LEDs at X rate
+77:                	  if (counterTog)
+00071A  8040C4     MOV counterTog, W4
+00071C  520FE0     SUB W4, #0x0, [W15]
+00071E  320002     BRA Z, 0x724
+78:                		{
+79:                			ToggleTest();
+000720  07FFCB     RCALL ToggleTest
+80:                #ifdef USAR_LCD
+81:                		 	Update_Time();	//Refresco la hora
+000722  07FF28     RCALL Update_Time
+82:                #endif // USAR_LCD
+83:                		}
+84:                #ifdef USAR_LCD
+85:                      /* Hay caracteres del ADC para LCD? */
+86:                  	  if ( adc_lcd_update ) 
+000724  208024     MOV #0x802, W4
+000726  784214     MOV.B [W4], W4
+000728  524FE0     SUB.B W4, #0x0, [W15]
+00072A  32002A     BRA Z, 0x780
+87:                  	  {
+88:                       	 //Valores al LCD
+89:                		 home_it();
+00072C  B3C020     MOV #0x2, W0
+00072E  07FF55     RCALL lcd_cmd
+90:                		 advolt( temp1 );
+000730  804004     MOV temp1, W4
+000732  780004     MOV W4, W0
+000734  07FDE3     RCALL advolt
+91:                       	 cursor_right();
+000736  B3C140     MOV #0x14, W0
+000738  07FF50     RCALL lcd_cmd
+92:                       	 cursor_right();
+00073A  B3C140     MOV #0x14, W0
+00073C  07FF4E     RCALL lcd_cmd
+93:                       	 cursor_right();  
+00073E  B3C140     MOV #0x14, W0
+000740  07FF4C     RCALL lcd_cmd
+94:                       	 cursor_right();
+000742  B3C140     MOV #0x14, W0
+000744  07FF4A     RCALL lcd_cmd
+95:                       	 cursor_right();
+000746  B3C140     MOV #0x14, W0
+000748  07FF48     RCALL lcd_cmd
+96:                       	 cursor_right();  
+00074A  B3C140     MOV #0x14, W0
+00074C  07FF46     RCALL lcd_cmd
+97:                       	 cursor_right();
+00074E  B3C140     MOV #0x14, W0
+000750  07FF44     RCALL lcd_cmd
+98:                       	 cursor_right();
+000752  B3C140     MOV #0x14, W0
+000754  07FF42     RCALL lcd_cmd
+99:                       	 cursor_right();
+000756  B3C140     MOV #0x14, W0
+000758  07FF40     RCALL lcd_cmd
+100:                      	 cursor_right();
+00075A  B3C140     MOV #0x14, W0
+00075C  07FF3E     RCALL lcd_cmd
+101:               		 lcd_data( adones );
+00075E  208034     MOV #0x803, W4
+000760  784214     MOV.B [W4], W4
+000762  784004     MOV.B W4, W0
+000764  07FF4F     RCALL lcd_data
+102:                      	 cursor_right();
+000766  B3C140     MOV #0x14, W0
+000768  07FF38     RCALL lcd_cmd
+103:               	  	 lcd_data( adtens );
+00076A  208044     MOV #0x804, W4
+00076C  784214     MOV.B [W4], W4
+00076E  784004     MOV.B W4, W0
+000770  07FF49     RCALL lcd_data
+104:               	  	 lcd_data( adhunds );
+000772  208054     MOV #0x805, W4
+000774  784214     MOV.B [W4], W4
+000776  784004     MOV.B W4, W0
+000778  07FF45     RCALL lcd_data
+105:               	     adc_lcd_update = 0;
+00077A  EB4200     CLR.B W4
+00077C  784004     MOV.B W4, W0
+00077E  B7E802     MOV.B WREG, adc_lcd_update
+106:               	  }
+107:               
+108:                     /* Hay caracteres de la UART para LCD? */
+109:                 	  if ( uart_lcd_update ) 
+000780  208154     MOV #0x815, W4
+000782  784214     MOV.B [W4], W4
+000784  524FE0     SUB.B W4, #0x0, [W15]
+000786  32FFC8     BRA Z, 0x718
+110:                 	  {
+111:               		line_2();
+000788  B3CC00     MOV #0xC0, W0
+00078A  07FF27     RCALL lcd_cmd
+112:               	  	lcd_data( caracter );
+00078C  208144     MOV #0x814, W4
+00078E  784214     MOV.B [W4], W4
+000790  784004     MOV.B W4, W0
+000792  07FF38     RCALL lcd_data
+113:               	    uart_lcd_update = 0;
+000794  EB4200     CLR.B W4
+000796  784004     MOV.B W4, W0
+000798  B7E815     MOV.B WREG, uart_lcd_update
+114:               	  }
+115:               #endif // USAR_LCD
+116:               	}
+000718  000000     NOP
+117:               }
+118:               
+119:               
+0006B8  FA0000     LNK #0x0
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/lcd.c  --------
+1:                 /**********************************************************************
+2:                 * REVISION HISTORY:
+3:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4:                 * Author            Date      Comments on this revision
+5:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6:                 * Richard Fischer   07/14/05  Explorer 16 board LCD support
+7:                 * Priyabrata Sinha  01/27/06  Ported to non-prototype devices
+8:                 *
+9:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+10:                *
+11:                * ADDITIONAL NOTES:
+12:                *
+13:                **********************************************************************/
+14:                #include "common.h"
+15:                #ifdef USAR_LCD
+16:                #include "p33FJ256GP710.h"
+17:                #include "lcd.h"
+18:                #include "delay.h"
+19:                
+20:                
+21:                void hexdec( unsigned char count );
+22:                volatile unsigned char hunds;
+23:                volatile unsigned char tens;
+24:                volatile unsigned char ones;
+25:                
+26:                // Control signal data pins 
+27:                #define  RW  LATDbits.LATD5       // LCD R/W signal
+28:                #define  RS  LATBbits.LATB15      // LCD RS signal
+29:                #define  E   LATDbits.LATD4       // LCD E signal 
+30:                //#define  E   LATFbits.LATF1       // LCD E signal
+31:                
+32:                // Control signal pin direction 
+33:                #define  RW_TRIS	TRISDbits.TRISD5 
+34:                #define  RS_TRIS	TRISBbits.TRISB15
+35:                #define  E_TRIS		TRISDbits.TRISD4
+36:                //#define  E_TRIS		TRISFbits.TRISF1
+37:                
+38:                // Data signals and pin direction
+39:                #define  DATA      LATE           // Port for LCD data
+40:                #define  DATAPORT  PORTE
+41:                #define  TRISDATA  TRISE          // I/O setup for data Port
+42:                
+43:                
+44:                
+45:                /****************************************************************************/
+46:                /*****	LCD SUBROUTINE  *****/
+47:                
+48:                void Init_LCD( void )             // initialize LCD display
+49:                {
+50:                	// 15mS delay after Vdd reaches nnVdc before proceeding with LCD initialization
+51:                	// not always required and is based on system Vdd rise rate
+52:                	Delay(Delay_15mS_Cnt);                  // 15ms delay
+0004EA  2005A0     MOV #0x5A, W0
+0004EC  07018A     RCALL Delay
+53:                			
+54:                	/* set initial states for the data and control pins */
+55:                	LATE &= 0xFF00;	
+0004EE  8016E5     MOV LATE, W5
+0004F0  2FF004     MOV #0xFF00, W4
+0004F2  628204     AND W5, W4, W4
+0004F4  8816E4     MOV W4, LATE
+56:                    RW = 0;                       // R/W state set low
+0004F6  A9A2D6     BCLR LATD, #5
+57:                	RS = 0;                       // RS state set low
+0004F8  A9E2CB     BCLR 0x2CB, #7
+58:                	E = 0;                        // E state set low
+0004FA  A982D6     BCLR LATD, #4
+59:                
+60:                	/* set data and control pins to outputs */
+61:                	TRISE &= 0xFF00;
+0004FC  8016C5     MOV TRISE, W5
+0004FE  2FF004     MOV #0xFF00, W4
+000500  628204     AND W5, W4, W4
+000502  8816C4     MOV W4, TRISE
+62:                 	RW_TRIS = 0;                  // RW pin set as output
+000504  A9A2D2     BCLR TRISD, #5
+63:                	RS_TRIS = 0;                  // RS pin set as output
+000506  A9E2C7     BCLR 0x2C7, #7
+64:                	E_TRIS = 0;                   // E pin set as output
+000508  A982D2     BCLR TRISD, #4
+65:                
+66:                	/* 1st LCD initialization sequence */
+67:                	DATA &= 0xFF00;
+00050A  8016E5     MOV LATE, W5
+00050C  2FF004     MOV #0xFF00, W4
+00050E  628204     AND W5, W4, W4
+000510  8816E4     MOV W4, LATE
+68:                    DATA |= 0x0038;
+000512  8016E5     MOV LATE, W5
+000514  200384     MOV #0x38, W4
+000516  728204     IOR W5, W4, W4
+000518  8816E4     MOV W4, LATE
+69:                    E = 1;	
+0004E8  FA0000     LNK #0x0
+00051A  A882D6     BSET LATD, #4
+70:                    Nop();
+00051C  000000     NOP
+71:                    Nop();
+00051E  000000     NOP
+72:                    Nop();
+000520  000000     NOP
+73:                    E = 0;                        // toggle E signal
+000522  A982D6     BCLR LATD, #4
+74:                   	Delay(Delay_5mS_Cnt);         // 5ms delay
+000524  2001E0     MOV #0x1E, W0
+000526  07016D     RCALL Delay
+75:                      
+76:                	/* 2nd LCD initialization sequence */
+77:                	DATA &= 0xFF00;
+000528  8016E5     MOV LATE, W5
+00052A  2FF004     MOV #0xFF00, W4
+00052C  628204     AND W5, W4, W4
+00052E  8816E4     MOV W4, LATE
+78:                    DATA |= 0x0038;
+000530  8016E5     MOV LATE, W5
+000532  200384     MOV #0x38, W4
+000534  728204     IOR W5, W4, W4
+000536  8816E4     MOV W4, LATE
+79:                    E = 1;	
+000538  A882D6     BSET LATD, #4
+80:                    Nop();
+00053A  000000     NOP
+81:                    Nop();
+00053C  000000     NOP
+82:                    Nop();	
+00053E  000000     NOP
+83:                    E = 0;                        // toggle E signal
+000540  A982D6     BCLR LATD, #4
+84:                    Delay_Us( Delay200uS_count ); // 200uS delay
+000542  200030     MOV #0x3, W0
+000544  07016C     RCALL Delay_Us
+85:                
+86:                	/* 3rd LCD initialization sequence */
+87:                	DATA &= 0xFF00;
+000546  8016E5     MOV LATE, W5
+000548  2FF004     MOV #0xFF00, W4
+00054A  628204     AND W5, W4, W4
+00054C  8816E4     MOV W4, LATE
+88:                    DATA |= 0x0038;
+00054E  8016E5     MOV LATE, W5
+000550  200384     MOV #0x38, W4
+000552  728204     IOR W5, W4, W4
+000554  8816E4     MOV W4, LATE
+89:                    E = 1;		
+000556  A882D6     BSET LATD, #4
+90:                    Nop();
+000558  000000     NOP
+91:                    Nop();
+00055A  000000     NOP
+92:                    Nop();	
+00055C  000000     NOP
+93:                    E = 0;                        // toggle E signal
+00055E  A982D6     BCLR LATD, #4
+94:                    Delay_Us( Delay200uS_count ); // 200uS delay
+000560  200030     MOV #0x3, W0
+000562  07015D     RCALL Delay_Us
+95:                
+96:                    lcd_cmd( 0x38 );              // function set
+000564  B3C380     MOV #0x38, W0
+000566  070039     RCALL lcd_cmd
+97:                    lcd_cmd( 0x0C );              // Display on/off control, cursor blink off (0x0C)
+000568  B3C0C0     MOV #0xC, W0
+00056A  070037     RCALL lcd_cmd
+98:                    lcd_cmd( 0x06 );			  // entry mode set (0x06)
+00056C  B3C060     MOV #0x6, W0
+00056E  070035     RCALL lcd_cmd
+99:                }
+000574  FA0000     LNK #0x0
+100:               
+101:               /*---------------------------------------------------------------------
+102:                 Function Name: Update_Time
+103:                 Description:   Update LCD for real-time clock data
+104:                 Inputs:        None
+105:                 Returns:       None
+106:               -----------------------------------------------------------------------*/
+107:               void Update_Time( void )
+108:               {
+109:               
+110:                  	/* position LCD cursor at column, row */
+111:                 	home_it();
+000576  B3C020     MOV #0x2, W0
+000578  070030     RCALL lcd_cmd
+112:               	hexdec( hours );
+00057A  2080A4     MOV #0x80A, W4
+00057C  784214     MOV.B [W4], W4
+00057E  784004     MOV.B W4, W0
+000580  07006A     RCALL hexdec
+113:               	lcd_data(tens + 0x30);
+000582  2080F4     MOV #0x80F, W4
+000584  784214     MOV.B [W4], W4
+000586  B04304     ADD.B #0x30, W4
+000588  784004     MOV.B W4, W0
+00058A  07003C     RCALL lcd_data
+114:               	lcd_data(ones + 0x30);
+00058C  208104     MOV #0x810, W4
+00058E  784214     MOV.B [W4], W4
+000590  B04304     ADD.B #0x30, W4
+000592  784004     MOV.B W4, W0
+000594  070037     RCALL lcd_data
+115:                   
+116:                   hexdec( minutes );
+000596  2080B4     MOV #0x80B, W4
+000598  784214     MOV.B [W4], W4
+00059A  784004     MOV.B W4, W0
+00059C  07005C     RCALL hexdec
+117:                   /* position LCD cursor at column, row */
+118:                   cursor_right();
+00059E  B3C140     MOV #0x14, W0
+0005A0  07001C     RCALL lcd_cmd
+119:               	lcd_data(tens + 0x30);
+0005A2  2080F4     MOV #0x80F, W4
+0005A4  784214     MOV.B [W4], W4
+0005A6  B04304     ADD.B #0x30, W4
+0005A8  784004     MOV.B W4, W0
+0005AA  07002C     RCALL lcd_data
+120:               	lcd_data(ones + 0x30);
+0005AC  208104     MOV #0x810, W4
+0005AE  784214     MOV.B [W4], W4
+0005B0  B04304     ADD.B #0x30, W4
+0005B2  784004     MOV.B W4, W0
+0005B4  070027     RCALL lcd_data
+121:               	 
+122:                 	hexdec( seconds );
+0005B6  2080C4     MOV #0x80C, W4
+0005B8  784214     MOV.B [W4], W4
+0005BA  784004     MOV.B W4, W0
+0005BC  07004C     RCALL hexdec
+123:               	/* position LCD cursor at column, row */
+124:                   cursor_right();
+0005BE  B3C140     MOV #0x14, W0
+0005C0  07000C     RCALL lcd_cmd
+125:               	lcd_data(tens + 0x30);
+0005C2  2080F4     MOV #0x80F, W4
+0005C4  784214     MOV.B [W4], W4
+0005C6  B04304     ADD.B #0x30, W4
+0005C8  784004     MOV.B W4, W0
+0005CA  07001C     RCALL lcd_data
+126:               	lcd_data(ones + 0x30);
+0005CC  208104     MOV #0x810, W4
+0005CE  784214     MOV.B [W4], W4
+0005D0  B04304     ADD.B #0x30, W4
+0005D2  784004     MOV.B W4, W0
+0005D4  070017     RCALL lcd_data
+127:               }
+0005DA  FA0002     LNK #0x2
+0005DC  784F00     MOV.B W0, [W14]
+128:               
+129:               
+130:               void lcd_cmd( char cmd )          // subroutiune for lcd commands
+131:               {
+132:               //	TRISD &= 0xFF00;              // ensure RD0 - RD7 are outputs
+133:               	DATA &= 0xFF00;               // prepare RD0 - RD7
+0005DE  8016E5     MOV LATE, W5
+0005E0  2FF004     MOV #0xFF00, W4
+0005E2  628204     AND W5, W4, W4
+0005E4  8816E4     MOV W4, LATE
+134:                   DATA |= cmd;                  // command byte to lcd
+0005E6  FB029E     SE [W14], W5
+0005E8  8016E4     MOV LATE, W4
+0005EA  728204     IOR W5, W4, W4
+0005EC  8816E4     MOV W4, LATE
+135:               	RW = 0;                       // ensure RW is 0
+0005EE  A9A2D6     BCLR LATD, #5
+136:                   RS = 0;
+0005F0  A9E2CB     BCLR 0x2CB, #7
+137:                   E = 1;                        // toggle E line
+0005F2  A882D6     BSET LATD, #4
+138:                   Nop();
+0005F4  000000     NOP
+139:                   Nop();
+0005F6  000000     NOP
+140:                   Nop();
+0005F8  000000     NOP
+141:                   E = 0;
+0005FA  A982D6     BCLR LATD, #4
+142:                  	Delay(Delay_5mS_Cnt);         // 5ms delay
+0005FC  2001E0     MOV #0x1E, W0
+0005FE  070101     RCALL Delay
+143:               }
+000604  FA0002     LNK #0x2
+000606  784F00     MOV.B W0, [W14]
+144:               
+145:               
+146:               void lcd_data( char data )        // subroutine for lcd data
+147:               {
+148:               //	TRISD &= 0xFF00;              // ensure RD0 - RD7 are outputs
+149:               	RW = 0;       				 // ensure RW is 0
+000608  A9A2D6     BCLR LATD, #5
+150:                   RS = 1;                       // assert register select to 1
+00060A  A8E2CB     BSET 0x2CB, #7
+151:               	DATA &= 0xFF00;               // prepare RD0 - RD7
+00060C  8016E5     MOV LATE, W5
+00060E  2FF004     MOV #0xFF00, W4
+000610  628204     AND W5, W4, W4
+000612  8816E4     MOV W4, LATE
+152:                   DATA |= data;                 // data byte to lcd
+000614  FB029E     SE [W14], W5
+000616  8016E4     MOV LATE, W4
+000618  728204     IOR W5, W4, W4
+00061A  8816E4     MOV W4, LATE
+153:                   E = 1;				
+00061C  A882D6     BSET LATD, #4
+154:                	Nop();
+00061E  000000     NOP
+155:                   Nop();
+000620  000000     NOP
+156:                   Nop();
+000622  000000     NOP
+157:                   E = 0;                       // toggle E signal
+000624  A982D6     BCLR LATD, #4
+158:                   RS = 0;                      // negate register select to 0
+000626  A9E2CB     BCLR 0x2CB, #7
+159:                   Delay_Us( Delay200uS_count ); // 200uS delay
+000628  200030     MOV #0x3, W0
+00062A  0700F9     RCALL Delay_Us
+160:                   Delay_Us( Delay200uS_count ); // 200uS delay
+00062C  200030     MOV #0x3, W0
+00062E  0700F7     RCALL Delay_Us
+161:               }
+000634  FA0004     LNK #0x4
+000636  780F00     MOV W0, [W14]
+000638  984721     MOV.B W1, [W14+2]
+162:               
+163:               
+164:               void puts_lcd( unsigned char *data, unsigned char count ) 
+165:               {
+166:                 	while ( count )
+00063A  370008     BRA 0x64C
+00064C  90422E     MOV.B [W14+2], W4
+00064E  524FE0     SUB.B W4, #0x0, [W15]
+000650  3AFFF5     BRA NZ, 0x63C
+167:               	{
+168:               		lcd_data( *data++ );
+00063C  78021E     MOV [W14], W4
+00063E  784214     MOV.B [W4], W4
+000640  E80F1E     INC [W14], [W14]
+000642  784004     MOV.B W4, W0
+000644  07FFDF     RCALL lcd_data
+169:               		count --;
+000646  90422E     MOV.B [W14+2], W4
+000648  E94204     DEC.B W4, W4
+00064A  984724     MOV.B W4, [W14+2]
+170:               	}	
+171:               }
+000656  FA0002     LNK #0x2
+000658  784F00     MOV.B W0, [W14]
+172:               
+173:               void hexdec( unsigned char count )
+174:               {
+175:                hunds = 0;						//initialize hundred
+00065A  EB4200     CLR.B W4
+00065C  784004     MOV.B W4, W0
+00065E  B7E80E     MOV.B WREG, hunds
+176:                tens  = 0;						//initialize tens
+000660  EB4200     CLR.B W4
+000662  784004     MOV.B W4, W0
+000664  B7E80F     MOV.B WREG, tens
+177:                ones = 0;						//initialzise ones
+000666  EB4200     CLR.B W4
+000668  784004     MOV.B W4, W0
+00066A  B7E810     MOV.B WREG, ones
+178:                
+179:               	while ( count >= 10 )
+00066C  37001E     BRA 0x6AA
+0006AA  78421E     MOV.B [W14], W4
+0006AC  524FE9     SUB.B W4, #0x9, [W15]
+0006AE  3EFFDF     BRA GTU, 0x66E
+180:               	{
+181:               
+182:               		if ( count >= 200 )		//check two hundreds
+00066E  B3CC74     MOV #0xC7, W4
+000670  78429E     MOV.B [W14], W5
+000672  52CF84     SUB.B W5, W4, [W15]
+000674  360005     BRA LEU, 0x680
+183:               		{
+184:               		  count -= 200;		    //subtract 200
+000676  B3C384     MOV #0x38, W4
+000678  424F1E     ADD.B W4, [W14], [W14]
+185:               		  hunds = 0x02;			//set for 2 hundred
+00067A  B3C024     MOV #0x2, W4
+00067C  784004     MOV.B W4, W0
+00067E  B7E80E     MOV.B WREG, hunds
+186:               		}
+187:               	
+188:               		if (count >= 100)		//check hundreds
+000680  B3C634     MOV #0x63, W4
+000682  78429E     MOV.B [W14], W5
+000684  52CF84     SUB.B W5, W4, [W15]
+000686  360007     BRA LEU, 0x696
+189:               		{
+190:               		  count -= 100;		    //subract 100
+000688  B3C9C4     MOV #0x9C, W4
+00068A  424F1E     ADD.B W4, [W14], [W14]
+191:               		  hunds++;				//increment hundred register
+00068C  2080E4     MOV #0x80E, W4
+00068E  784214     MOV.B [W4], W4
+000690  E84204     INC.B W4, W4
+000692  784004     MOV.B W4, W0
+000694  B7E80E     MOV.B WREG, hunds
+192:               		}
+193:               	
+194:               		if (count >= 10 )		//check tens
+000696  78421E     MOV.B [W14], W4
+000698  524FE9     SUB.B W4, #0x9, [W15]
+00069A  360007     BRA LEU, 0x6AA
+195:               		{
+196:               		  count -= 10;		    //subtract 10
+00069C  78421E     MOV.B [W14], W4
+00069E  524F6A     SUB.B W4, #0xA, [W14]
+197:               		  tens++;				//increment tens
+0006A0  2080F4     MOV #0x80F, W4
+0006A2  784214     MOV.B [W4], W4
+0006A4  E84204     INC.B W4, W4
+0006A6  784004     MOV.B W4, W0
+0006A8  B7E80F     MOV.B WREG, tens
+198:               		}
+199:               	}
+200:               
+201:               	ones = count;				//remaining count equals ones
+0006B0  78401E     MOV.B [W14], W0
+0006B2  B7E810     MOV.B WREG, ones
+202:               }
+203:               
+204:               #endif // USAR_LCD
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/isr_timer46.c  
+1:                 #include "p33FJ256GP710.h"
+2:                 #include "config.h"
+3:                 #define ValPR4	39062
+4:                 #define ValPR6	0
+5:                 
+6:                 volatile unsigned char hours;
+7:                 volatile unsigned char minutes;
+8:                 volatile unsigned char seconds;
+9:                 extern int counterTog;
+10:                
+11:                
+12:                /*---------------------------------------------------------------------
+13:                  Function Name: _T4Interrupt
+14:                  Description:   Timer4 Interrupt Handler
+15:                
+16:                Comments: 39062
+17:                -----------------------------------------------------------------------*/
+18:                void __attribute__((interrupt, auto_psv)) _T4Interrupt( void )
+19:                {
+20:                	/* reset Timer 4 interrupt flag */
+21:                 	IFS1bits.T4IF = 0;
+00043E  A96087     BCLR 0x87, #3
+22:                	//T4CONbits.TON = 0; 	//Deshabilito Timer
+23:                	counterTog ++;
+000440  8040C4     MOV counterTog, W4
+000442  E80204     INC W4, W4
+000444  8840C4     MOV W4, counterTog
+24:                
+25:                }
+00044E  FA0000     LNK #0x0
+26:                
+27:                /*---------------------------------------------------------------------
+28:                  Function Name: Init_Timer4
+29:                  Description:   Initialize Timer4
+30:                
+31:                -----------------------------------------------------------------------*/
+32:                void Init_Timer4( void )
+33:                {
+34:                	/* ensure Timer 4 is in reset state */
+35:                	T4CON = 0;
+000450  EB0200     CLR W4
+000452  8808F4     MOV W4, T4CON
+36:                	T4CONbits.TCKPS = 3; //Prescaler 256
+000454  8008F4     MOV T4CON, W4
+000456  A04004     BSET W4, #4
+000458  A05004     BSET W4, #5
+00045A  8808F4     MOV W4, T4CON
+37:                
+38:                	/* reset Timer 4 interrupt flag */
+39:                 	IFS1bits.T4IF = 0;
+00045C  A96087     BCLR 0x87, #3
+40:                 	
+41:                 	/* set Timer interrupt priority level */
+42:                	IPC6bits.T4IP = 5;
+00045E  800584     MOV IPC6, W4
+000460  A0C004     BSET W4, #12
+000462  A1D004     BCLR W4, #13
+000464  A0E004     BSET W4, #14
+000466  880584     MOV W4, IPC6
+43:                
+44:                	/* enable Timer interrupt */
+45:                 	IEC1bits.T4IE = 1;
+000468  A86097     BSET 0x97, #3
+46:                 	  	
+47:                	/* set Timer period register */
+48:                	PR4 = ValPR4;
+00046A  298964     MOV #0x9896, W4
+00046C  8808D4     MOV W4, PR4
+49:                	T4CONbits.TON = 1; 	//habilito Timer
+00046E  A8E11F     BSET 0x11F, #7
+50:                
+51:                }
+000474  F80034     PUSH PSVPAG
+000476  781F88     MOV W8, [W15++]
+000478  200008     MOV #0x0, W8
+00047A  8801A8     MOV W8, PSVPAG
+00047C  78044F     MOV [--W15], W8
+00047E  FA0000     LNK #0x0
+52:                
+53:                
+54:                /*---------------------------------------------------------------------
+55:                  Function Name: _T6Interrupt
+56:                  Description:   Timer6 Interrupt Handler
+57:                
+58:                -----------------------------------------------------------------------*/
+59:                void __attribute__((interrupt, auto_psv)) _T6Interrupt( void )
+60:                {
+61:                	/* reset Timer 6 interrupt flag */
+62:                 	IFS2bits.T6IF = 0;
+000480  A9E089     BCLR 0x89, #7
+63:                	T6CONbits.TON = 0;	//Deshabilito Timer6
+000482  A9E12D     BCLR 0x12D, #7
+64:                
+65:                }
+00048A  FA0000     LNK #0x0
+66:                
+67:                /*---------------------------------------------------------------------
+68:                  Function Name: Init_Timer6
+69:                  Description:   Initialize Timer6
+70:                
+71:                -----------------------------------------------------------------------*/
+72:                void Init_Timer6( void )
+73:                {
+74:                	
+75:                	/* ensure Timer 6 is in reset state */
+76:                	T6CON = 0;
+00048C  EB0200     CLR W4
+00048E  880964     MOV W4, T6CON
+77:                	T6CONbits.TCKPS = 1; //Prescaler 8
+000490  800964     MOV T6CON, W4
+000492  A04004     BSET W4, #4
+000494  A15004     BCLR W4, #5
+000496  880964     MOV W4, T6CON
+78:                
+79:                	/* reset Timer 6 interrupt flag */
+80:                 	IFS2bits.T6IF = 0;
+000498  A9E089     BCLR 0x89, #7
+81:                 	
+82:                 	/* set Timer interrupt priority level */
+83:                	IPC11bits.T6IP = 5;
+000434  781F84     MOV W4, [W15++]
+000436  F80034     PUSH PSVPAG
+000438  200004     MOV #0x0, W4
+00043A  8801A4     MOV W4, PSVPAG
+00043C  FA0000     LNK #0x0
+00049A  8005D4     MOV IPC11, W4
+00049C  A0C004     BSET W4, #12
+00049E  A1D004     BCLR W4, #13
+0004A0  A0E004     BSET W4, #14
+0004A2  8805D4     MOV W4, IPC11
+84:                
+85:                	/* enable Timer interrupt */
+86:                 	IEC2bits.T6IE = 1;
+0004A4  A8E099     BSET 0x99, #7
+87:                 	  	
+88:                	/* set Timer period register */
+89:                	PR6 = ValPR6;
+0004A6  EB0200     CLR W4
+0004A8  880944     MOV W4, PR6
+90:                	T6CONbits.TON = 1; 	//habilito Timer
+0004AA  A8E12D     BSET 0x12D, #7
+91:                
+92:                }
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/isr_UART2.c  --
+1:                 /* REVISION HISTORY:
+2:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3:                 * Author            Date      Comments on this revision
+4:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5:                 * Ricardo López   11/6/10  UART2C module interrupt handler
+6:                 * Marcelo Gómez   09/03/14 Portado a MPLAB.X
+7:                 *
+8:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+9:                 *
+10:                * ADDITIONAL NOTES:
+11:                *
+12:                *
+13:                **********************************************************************/
+14:                
+15:                #include "p33FJ256GP710.h"
+16:                
+17:                //UART
+18:                #define FCY 40000000
+19:                #define BAUDRATE 9600
+20:                #define BRGVAL ((FCY / BAUDRATE) / 16) -1
+21:                
+22:                volatile unsigned char caracter;
+23:                int cant = 0;   //Cantidad de caracteres a enviar
+24:                volatile unsigned char uart_lcd_update;
+25:                
+26:                /*---------------------------------------------------------------------
+27:                  Function Name: UART2Interrupt
+28:                  Description:   UART2 Interrupt Handler
+29:                  Inputs:        None
+30:                  Returns:       None
+31:                -----------------------------------------------------------------------*/
+32:                //Interrupciones de la UART2
+33:                
+34:                void __attribute__((interrupt, auto_psv)) _U2RXInterrupt( void )
+35:                {
+36:                	IFS1bits.U2RXIF = 0;
+0003CA  A9C087     BCLR 0x87, #6
+37:                	caracter = U2RXREG;
+0003CC  8011B4     MOV U2RXREG, W4
+0003CE  784204     MOV.B W4, W4
+0003D0  784004     MOV.B W4, W0
+0003D2  B7E814     MOV.B WREG, caracter
+38:                        cant = 1;
+0003D4  200014     MOV #0x1, W4
+0003D6  8840B4     MOV W4, cant
+39:                	IFS1bits.U2TXIF = 1;	//Obligo Tx
+0003D8  A8E087     BSET 0x87, #7
+40:                }
+0003E4  781F80     MOV W0, [W15++]
+0003E6  781F84     MOV W4, [W15++]
+0003E8  F80034     PUSH PSVPAG
+0003EA  200000     MOV #0x0, W0
+0003EC  8801A0     MOV W0, PSVPAG
+0003EE  FA0000     LNK #0x0
+41:                
+42:                //Rutina de INT para transmisión (no hace nada)
+43:                void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
+44:                {
+45:                	//Atención. Se debe modificar para que no emita reiteradamente
+46:                	//caracteres
+47:                    IFS1bits.U2TXIF = 0;
+0003F0  A9E087     BCLR 0x87, #7
+48:                    if(cant > 0)
+0003F2  8040B4     MOV cant, W4
+0003F4  520FE0     SUB W4, #0x0, [W15]
+0003F6  34000A     BRA LE, 0x40C
+49:                    {
+50:                        --cant;
+0003F8  8040B4     MOV cant, W4
+0003FA  E90204     DEC W4, W4
+0003FC  8840B4     MOV W4, cant
+51:                	U2TXREG = caracter;	//Simple ECO
+0003FE  208144     MOV #0x814, W4
+000400  784214     MOV.B [W4], W4
+000402  FB8204     ZE W4, W4
+000404  8811A4     MOV W4, U2TXREG
+52:                        uart_lcd_update = 1;
+000406  B3C014     MOV #0x1, W4
+000408  784004     MOV.B W4, W0
+00040A  B7E815     MOV.B WREG, uart_lcd_update
+53:                    }
+54:                }
+000416  FA0000     LNK #0x0
+55:                
+56:                /*---------------------------------------------------------------------
+57:                  Function Name: InitUART2
+58:                  Description:   Inicializar UART2
+59:                  Inputs:        None
+60:                  Returns:       None
+61:                -----------------------------------------------------------------------*/
+62:                void InitUART2(void)
+63:                {
+64:                	// The HPC16 board has a DB9 connector wired to UART2, 
+65:                	// so we will be configuring this port only
+66:                	// configure U2MODE
+67:                	U2MODEbits.UARTEN = 0;	// Bit15 TX, RX DISABLED, ENABLE at end of func
+000418  A9E231     BCLR 0x231, #7
+68:                	U2MODEbits.RTSMD = 1;	// Bit11 Simplex Mode
+00041A  A86231     BSET 0x231, #3
+69:                
+70:                	// Load a value into Baud Rate Generator.  Example is for 9600.
+71:                	U2BRG = BRGVAL;	// 40Mhz osc, 9600 Baud
+00041C  201034     MOV #0x103, W4
+00041E  8811C4     MOV W4, U2BRG
+72:                
+73:                	IPC7 = 0x4400;	// Mid Range Interrupt Priority level, no urgent reason
+000420  244004     MOV #0x4400, W4
+000422  880594     MOV W4, IPC7
+74:                
+75:                	IFS1bits.U2RXIF = 0;	// Clear the Recieve Interrupt Flag
+000424  A9C087     BCLR 0x87, #6
+76:                	IEC1bits.U2RXIE = 1;	// Enable Recieve Interrupts
+000426  A8C097     BSET 0x97, #6
+77:                
+78:                	U2MODEbits.UARTEN = 1;	// And turn the peripheral on
+000428  A8E231     BSET 0x231, #7
+79:                	U2STAbits.UTXEN = 1;	// Empieza a transmitir. Se dispara el Flag TXIF
+00042A  A84233     BSET 0x233, #2
+80:                
+81:                	IFS1bits.U2TXIF = 0;	// Clear the Transmit Interrupt Flag
+00042C  A9E087     BCLR 0x87, #7
+82:                	IEC1bits.U2TXIE = 1;	// Enable Transmit Interrupts
+00042E  A8E097     BSET 0x97, #7
+83:                }
+0003BE  781F80     MOV W0, [W15++]
+0003C0  781F84     MOV W4, [W15++]
+0003C2  F80034     PUSH PSVPAG
+0003C4  200000     MOV #0x0, W0
+0003C6  8801A0     MOV W0, PSVPAG
+0003C8  FA0000     LNK #0x0
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/isr_ADC.c  ----
+000294  781F80     MOV W0, [W15++]
+000296  BE9F84     MOV.D W4, [W15++]
+000298  F80034     PUSH PSVPAG
+00029A  200000     MOV #0x0, W0
+00029C  8801A0     MOV W0, PSVPAG
+00029E  FA0000     LNK #0x0
+1:                 #include "p33FJ256GP710.h"
+2:                 
+3:                 volatile unsigned int temp1;
+4:                 volatile unsigned char adc_lcd_update;
+5:                 
+6:                 volatile unsigned char adones;
+7:                 volatile unsigned char adtens;
+8:                 volatile unsigned char adhunds;
+9:                 volatile unsigned char adthous;
+10:                
+11:                int count;
+12:                /*---------------------------------------------------------------------
+13:                  Function Name: ADCInterrupt
+14:                  Description:   ADC Interrupt Handler
+15:                  Inputs:        None
+16:                  Returns:       None
+17:                -----------------------------------------------------------------------*/
+18:                void __attribute__((interrupt, auto_psv)) _ADC1Interrupt( void )
+19:                {
+20:                
+21:                	/* Se hace para percibir cuando hay muestra nueva */
+22:                	if ( count++ == 2000 ) {
+0002A0  804045     MOV count, W5
+0002A2  207D04     MOV #0x7D0, W4
+0002A4  6A8204     XOR W5, W4, W4
+0002A6  A7F004     BTSC W4, #15
+0002A8  EA0204     NEG W4, W4
+0002AA  E90204     DEC W4, W4
+0002AC  DE224F     LSR W4, #15, W4
+0002AE  784204     MOV.B W4, W4
+0002B0  E80285     INC W5, W5
+0002B2  884045     MOV W5, count
+0002B4  524FE0     SUB.B W4, #0x0, [W15]
+0002B6  320004     BRA Z, 0x2C0
+23:                		__builtin_btg( (unsigned int *)&LATA, 7 );
+0002B8  202C44     MOV #0x2C4, W4
+0002BA  A27014     BTG [W4], #7
+24:                		count = 0;
+0002BC  EB0200     CLR W4
+0002BE  884044     MOV W4, count
+25:                	}
+26:                	
+27:                	/* Save the RP5 Potentiometer data */
+28:                	temp1 = ADC1BUF0;             
+0002C0  801804     MOV ADC1BUF0, W4
+0002C2  884004     MOV W4, temp1
+29:                
+30:                	/* set flag to update LCD */
+31:                	adc_lcd_update = 1;
+0002C4  B3C014     MOV #0x1, W4
+0002C6  784004     MOV.B W4, W0
+0002C8  B7E802     MOV.B WREG, adc_lcd_update
+32:                	
+33:                	/* reset ADC interrupt flag */
+34:                	IFS0bits.AD1IF = 0;           
+0002CA  A9A085     BCLR 0x85, #5
+35:                }
+0002D6  FA0000     LNK #0x0
+36:                  
+37:                /*---------------------------------------------------------------------
+38:                  Function Name: Init_ADC
+39:                  Description:   Initialize ADC module
+40:                  Inputs:        None
+41:                  Returns:       None
+42:                -----------------------------------------------------------------------*/
+43:                void Init_ADC( void )
+44:                {
+45:                	/* set port configuration here */ 		
+46:                 	AD1PCFGLbits.PCFG4 = 0;         // ensure AN4/RB4 is analog (Temp Sensor)
+0002D8  A9832C     BCLR AD1PCFGL, #4
+47:                 	AD1PCFGLbits.PCFG5 = 0;         // ensure AN5/RB5 is analog (Analog Pot)
+0002DA  A9A32C     BCLR AD1PCFGL, #5
+48:                 
+49:                 	/* set channel scanning here, auto sampling and convert, 
+50:                 	   with default read-format mode */
+51:                	AD1CON1 = 0x00E4;
+0002DC  200E44     MOV #0xE4, W4
+0002DE  881904     MOV W4, AD1CON1
+52:                
+53:                	/* select 12-bit, 1 channel ADC operation */
+54:                	AD1CON1bits.AD12B = 1;
+0002E0  A84321     BSET 0x321, #2
+55:                	
+56:                	/* No channel scan for CH0+, Use MUX A,  
+57:                	   SMPI = 1 per interrupt, Vref = AVdd/AVss */
+58:                	AD1CON2 = 0x0000;
+0002E2  EB0200     CLR W4
+0002E4  881914     MOV W4, AD1CON2
+59:                	
+60:                	/* Set Samples and bit conversion time */
+61:                	AD1CON3 = 0x032F; 
+0002E6  2032F4     MOV #0x32F, W4
+0002E8  881924     MOV W4, AD1CON3
+62:                        	
+63:                	/* set channel scanning here for AN4 and AN5 */
+64:                	AD1CSSL = 0x0000;
+0002EA  EB0200     CLR W4
+0002EC  881984     MOV W4, AD1CSSL
+65:                	
+66:                	/* channel select AN5 */
+67:                	AD1CHS0 = 0x0005;
+0002EE  200054     MOV #0x5, W4
+0002F0  881944     MOV W4, AD1CHS0
+68:                	
+69:                	/* reset ADC interrupt flag */
+70:                	IFS0bits.AD1IF = 0;           
+0002F2  A9A085     BCLR 0x85, #5
+71:                
+72:                	/* enable ADC interrupts, disable this interrupt if the DMA is enabled */	  
+73:                	IEC0bits.AD1IE = 1;       
+0002F4  A8A095     BSET 0x95, #5
+74:                
+75:                	/* turn on ADC module */
+76:                	AD1CON1bits.ADON = 1;          	
+0002F6  A8E321     BSET 0x321, #7
+77:                }
+0002FC  FA0002     LNK #0x2
+0002FE  780F00     MOV W0, [W14]
+78:                
+79:                  
+80:                /*---------------------------------------------------------------------
+81:                  Function Name: advolt
+82:                  Description:   Convert Raw ADC data to volts for LCD display
+83:                  Inputs:        Raw ADC data 
+84:                  Returns:       None
+85:                -----------------------------------------------------------------------*/
+86:                void advolt( unsigned int adc_conv_data )
+87:                {
+88:                 adones = 0;					    // reset values
+000300  EB4200     CLR.B W4
+000302  784004     MOV.B W4, W0
+000304  B7E803     MOV.B WREG, adones
+89:                 adtens = 0;
+000306  EB4200     CLR.B W4
+000308  784004     MOV.B W4, W0
+00030A  B7E804     MOV.B WREG, adtens
+90:                 adhunds = 0;
+00030C  EB4200     CLR.B W4
+00030E  784004     MOV.B W4, W0
+000310  B7E805     MOV.B WREG, adhunds
+91:                 adthous = 0;
+000312  EB4200     CLR.B W4
+000314  784004     MOV.B W4, W0
+000316  B7E806     MOV.B WREG, adthous
+92:                 
+93:                 while ( adc_conv_data > 0 )
+000318  370039     BRA 0x38C
+00038C  78021E     MOV [W14], W4
+00038E  520FE0     SUB W4, #0x0, [W15]
+000390  3AFFC4     BRA NZ, 0x31A
+94:                 {
+95:                  	if( adc_conv_data > 1241 )		//test for 1 volt or greater
+00031A  204D94     MOV #0x4D9, W4
+00031C  78029E     MOV [W14], W5
+00031E  528F84     SUB W5, W4, [W15]
+000320  360008     BRA LEU, 0x332
+96:                	{
+97:                		adones++;			        //increment 1 volt counter
+000322  208034     MOV #0x803, W4
+000324  784214     MOV.B [W4], W4
+000326  E84204     INC.B W4, W4
+000328  784004     MOV.B W4, W0
+00032A  B7E803     MOV.B WREG, adones
+98:                		adc_conv_data -= 1242;		//subtract 1 volt
+00032C  2FB264     MOV #0xFB26, W4
+00032E  420F1E     ADD W4, [W14], [W14]
+000330  37002D     BRA 0x38C
+99:                	}
+100:               	
+101:               	else if( adc_conv_data > 124 )	//test for 0.1 volt	
+000332  2007C4     MOV #0x7C, W4
+000334  78029E     MOV [W14], W5
+000336  528F84     SUB W5, W4, [W15]
+000338  360015     BRA LEU, 0x364
+102:               	{
+103:               		if ( adtens < 9 )
+00033A  208044     MOV #0x804, W4
+00033C  784214     MOV.B [W4], W4
+00033E  524FE8     SUB.B W4, #0x8, [W15]
+000340  3E0006     BRA GTU, 0x34E
+104:               		{
+105:               		  adtens++;			//increment tenths
+000342  208044     MOV #0x804, W4
+000344  784214     MOV.B [W4], W4
+000346  E84204     INC.B W4, W4
+000348  784004     MOV.B W4, W0
+00034A  B7E804     MOV.B WREG, adtens
+00034C  370008     BRA 0x35E
+106:               		}
+107:               		else 
+108:               		{
+109:               		  adones++;			//tenths has rolled over
+00034E  208034     MOV #0x803, W4
+000350  784214     MOV.B [W4], W4
+000352  E84204     INC.B W4, W4
+000354  784004     MOV.B W4, W0
+000356  B7E803     MOV.B WREG, adones
+110:               		  adtens = 0;		//so increment ones and reset tenths
+000358  EB4200     CLR.B W4
+00035A  784004     MOV.B W4, W0
+00035C  B7E804     MOV.B WREG, adtens
+111:               		}
+112:               
+113:               		adc_conv_data -= 125;        //test for 0.01 volt
+00035E  2FF834     MOV #0xFF83, W4
+000360  420F1E     ADD W4, [W14], [W14]
+000362  370014     BRA 0x38C
+114:               	}
+115:               
+116:               	else if( adc_conv_data > 12 )		
+000364  78021E     MOV [W14], W4
+000366  520FEC     SUB W4, #0xC, [W15]
+000368  360008     BRA LEU, 0x37A
+117:               	{
+118:               		adhunds++;			//increment hundreths
+00036A  208054     MOV #0x805, W4
+00036C  784214     MOV.B [W4], W4
+00036E  E84204     INC.B W4, W4
+000370  784004     MOV.B W4, W0
+000372  B7E805     MOV.B WREG, adhunds
+119:               		adc_conv_data -= 13;
+000374  78021E     MOV [W14], W4
+000376  520F6D     SUB W4, #0xD, [W14]
+000378  370009     BRA 0x38C
+120:               	}
+121:                
+122:               	else if ( adc_conv_data <= 12 )
+00037A  78021E     MOV [W14], W4
+00037C  520FEC     SUB W4, #0xC, [W15]
+00037E  3E0006     BRA GTU, 0x38C
+123:               	{
+124:               		adthous++;
+000380  208064     MOV #0x806, W4
+000382  784214     MOV.B [W4], W4
+000384  E84204     INC.B W4, W4
+000386  784004     MOV.B W4, W0
+000388  B7E806     MOV.B WREG, adthous
+125:               		adc_conv_data --;
+00038A  E90F1E     DEC [W14], [W14]
+126:               	}
+127:                }
+128:               
+129:               	adones += 0x30;				
+000392  208034     MOV #0x803, W4
+000394  784214     MOV.B [W4], W4
+000396  B04304     ADD.B #0x30, W4
+000398  784004     MOV.B W4, W0
+00039A  B7E803     MOV.B WREG, adones
+130:                	adtens += 0x30;
+00039C  208044     MOV #0x804, W4
+00039E  784214     MOV.B [W4], W4
+0003A0  B04304     ADD.B #0x30, W4
+0003A2  784004     MOV.B W4, W0
+0003A4  B7E804     MOV.B WREG, adtens
+131:                	adhunds += 0x30;
+0003A6  208054     MOV #0x805, W4
+0003A8  784214     MOV.B [W4], W4
+0003AA  B04304     ADD.B #0x30, W4
+0003AC  784004     MOV.B W4, W0
+0003AE  B7E805     MOV.B WREG, adhunds
+132:               	adthous += 0x30;
+0003B0  208064     MOV #0x806, W4
+0003B2  784214     MOV.B [W4], W4
+0003B4  B04304     ADD.B #0x30, W4
+0003B6  784004     MOV.B W4, W0
+0003B8  B7E806     MOV.B WREG, adthous
+133:               } 
+134:               
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/delay.c  ------
+1:                 /*********************************************************************
+2:                  *
+3:                  *                    Simple Delay Routines 
+4:                  *
+5:                  *********************************************************************
+6:                  * FileName:        delay.c
+7:                  * Dependencies:    delay.h
+8:                  * Processor:       dsPIC33F
+9:                  * Complier:        MPLAB C30 v2.01.00 or higher
+10:                 *
+11:                 * Company:         Microchip Technology, Inc.
+12:                 *
+13:                 * Software License Agreement
+14:                 *
+15:                 * The software supplied herewith by Microchip Technology Incorporated
+16:                 * (the Company) for its dsPIC30F Microcontroller is intended 
+17:                 * and supplied to you, the Companys customer, for use solely and
+18:                 * exclusively on Microchip's dsPIC30F Microcontroller products. 
+19:                 * The software is owned by the Company and/or its supplier, and is
+20:                 * protected under applicable copyright laws. All rights are reserved.
+21:                 * Any use in violation of the foregoing restrictions may subject the
+22:                 * user to criminal sanctions under applicable laws, as well as to
+23:                 * civil liability for the breach of the terms and conditions of this
+24:                 * license.
+25:                 *
+26:                 * THIS SOFTWARE IS PROVIDED IN AN AS IS CONDITION. NO WARRANTIES,
+27:                 * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+28:                 * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+29:                 * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+30:                 * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+31:                 * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+32:                 *
+33:                 * Author               Date    Comment
+34:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+35:                 * Richard Fischer      7/14/05 Initial release for LCD support
+36:                 * Priyabrata Sinha     1/27/06 Ported to non-prototype devices
+37:                 *
+38:                 ********************************************************************/
+39:                
+40:                #include "delay.h"
+41:                
+42:                unsigned int temp_count;
+43:                
+44:                void Delay( unsigned int delay_count ) 
+45:                {
+46:                	temp_count = delay_count +1;
+000806  E8021E     INC [W14], W4
+000808  884094     MOV W4, temp_count
+47:                	asm volatile("outer: dec _temp_count");	
+00080A  ED2812     DEC temp_count
+48:                	asm volatile("cp0 _temp_count");
+00080C  E20812     CP0 temp_count
+49:                	asm volatile("bra z, done");
+00080E  320005     BRA Z, done
+50:                	asm volatile("do #3200, inner" );	
+000810  080C80     DO #3200, inner
+000812  000001     NOP
+51:                	asm volatile("nop");
+000814  000000     NOP
+52:                	asm volatile("inner: nop");
+000816  000000     NOP
+53:                	asm volatile("bra outer");
+000818  37FFF8     BRA outer
+54:                	asm volatile("done:");
+55:                }
+00081E  FA0002     LNK #0x2
+000820  780F00     MOV W0, [W14]
+56:                	
+57:                
+58:                void Delay_Us( unsigned int delayUs_count )
+59:                {
+60:                	temp_count = delayUs_count +1;
+000822  E8021E     INC [W14], W4
+000824  884094     MOV W4, temp_count
+61:                	asm volatile("outer1: dec _temp_count");	
+000826  ED2812     DEC temp_count
+62:                	asm volatile("cp0 _temp_count");
+000828  E20812     CP0 temp_count
+63:                	asm volatile("bra z, done1");
+00082A  320005     BRA Z, done1
+64:                	asm volatile("do #1500, inner1" );	
+00082C  0805DC     DO #1500, inner1
+00082E  000001     NOP
+65:                	asm volatile("nop");
+000830  000000     NOP
+66:                	asm volatile("inner1: nop");
+000832  000000     NOP
+67:                	asm volatile("bra outer1");
+000834  37FFF8     BRA outer1
+68:                	asm volatile("done1:");
+69:                }		
+70:                
+000802  FA0002     LNK #0x2
+000804  780F00     MOV W0, [W14]
+---  /home/marcelo/Dropbox/UNPSJB/Arquitectura/2014/Proyectos_base/proyectobase4.X/source/config.c  -----
+00079C  FA0000     LNK #0x0
+1:                 /**********************************************************************
+2:                 * REVISION HISTORY:
+3:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4:                 * Author            Date      Comments on this revision
+5:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6:                 * Ricardo López     03/11/2011  1ra. versión
+7:                 * Sebastián Wahler  08/05/2013  2da. versión
+8:                 * Marcelo Gómez     09/03/2014  Portado a MPLAB.X
+9:                 *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+10:                *
+11:                * ADDITIONAL NOTES:
+12:                *
+13:                **********************************************************************/
+14:                #include "p33FJ256GP710.h"
+15:                #include "common.h"
+16:                #include "lcd.h"
+17:                #include "config.h"
+18:                
+19:                void config( void )
+20:                {
+21:                
+22:                	//Velocidad del proceso con Xtal de 8 Mhz
+23:                 
+24:                	/*Set up the oscillator and PLL for 40 MIPS as follows:
+25:                	Para Fin = 8MHZ (que trae la placa EXPLORER 16
+26:                	Elegimos:
+27:                	PLLPRE = N1 = 2, con lo que VCO input= (Fin/N1) = 4 MHZ (ACEPTABLE)
+28:                	PLLDIV = M = 40, con lo que VCO output= (VCO in * M) = 160 MHZ (ACEPTABLE)
+29:                	PLLPOST = N2 = 2 (valor inferior) Luego,
+30:                	                  Fin           M (PLLDIV)         8 MHZ * 40 
+31:                	 Fcy = Fosc /2 = ----------  *  --------------- =  ---------- = 40 MIPS
+32:                	                 N1(PLLPRE)     2 * N2(PLLPOST)	   2 * 2 * 2
+33:                    */
+34:                	//Cristal de Fosc = 8 MHZ y FCY = 40 MIPS,	o sea,
+35:                	//CLKDIV = 0x0000; //  PLLPOST = N2 = 2 , PLLPRE = N1 = 2
+36:                	//PLLFBD = 0x0026; // PLLDIV = M = 40
+37:                
+38:                #ifdef USAR_LCD
+39:                	//Manejo del Xtal de la aplicación
+40:                	CLKDIV = 0;
+00079E  EB0200     CLR W4
+0007A0  883A24     MOV W4, CLKDIV
+41:                	PLLFBD = 38;
+0007A2  200264     MOV #0x26, W4
+0007A4  883A34     MOV W4, PLLFBD
+42:                	
+43:                	//En placa Explorer 16 con Xtal físico de 8 MHZ
+44:                	//se obtiene velocidad de 40 Mhz con PLL
+45:                	__builtin_write_OSCCONH(0x03);		/*	Initiate Clock Switch to Primary Oscillator with PLL (NOSC=0b011)*/
+0007A6  200036     MOV #0x3, W6
+0007A8  200784     MOV #0x78, W4
+0007AA  2009A5     MOV #0x9A, W5
+0007AC  207437     MOV #0x743, W7
+0007AE  784B84     MOV.B W4, [W7]
+0007B0  784B85     MOV.B W5, [W7]
+0007B2  784B86     MOV.B W6, [W7]
+46:                	__builtin_write_OSCCONL(0x01);
+0007B4  200016     MOV #0x1, W6
+0007B6  200464     MOV #0x46, W4
+0007B8  200575     MOV #0x57, W5
+0007BA  207427     MOV #0x742, W7
+0007BC  784B84     MOV.B W4, [W7]
+0007BE  784B85     MOV.B W5, [W7]
+0007C0  784B86     MOV.B W6, [W7]
+47:                	while (OSCCONbits.COSC != 0b011);	/*	Wait for Clock switch to occur	*/
+0007C2  000000     NOP
+0007C4  803A15     MOV OSCCON, W5
+0007C6  270004     MOV #0x7000, W4
+0007C8  628284     AND W5, W4, W5
+0007CA  230004     MOV #0x3000, W4
+0007CC  528F84     SUB W5, W4, [W15]
+0007CE  3AFFFA     BRA NZ, 0x7C4
+48:                	while(!OSCCONbits.LOCK);
+0007D0  000000     NOP
+0007D2  803A15     MOV OSCCON, W5
+0007D4  200204     MOV #0x20, W4
+0007D6  628204     AND W5, W4, W4
+0007D8  520FE0     SUB W4, #0x0, [W15]
+0007DA  32FFFB     BRA Z, 0x7D2
+49:                #endif // USAR_LCD
+50:                        
+51:                	//Variables
+52:                	/* Initialize some general use variables */
+53:                	hours, minutes, seconds = 0;
+0007DC  2080A4     MOV #0x80A, W4
+0007DE  784214     MOV.B [W4], W4
+0007E0  2080B4     MOV #0x80B, W4
+0007E2  784214     MOV.B [W4], W4
+0007E4  EB4200     CLR.B W4
+0007E6  784004     MOV.B W4, W0
+0007E8  B7E80C     MOV.B WREG, seconds
+54:                
+55:                	//Inicialización de PORTS I/O
+56:                	/* set LEDs (D3-D10/RA0-RA7) drive state low */
+57:                	LATA  = 0xFF00; 
+0007EA  2FF004     MOV #0xFF00, W4
+0007EC  881624     MOV W4, LATA
+58:                	/* set LED pins (D3-D10/RA0-RA7) as outputs */
+59:                	TRISA = 0xFF00; 
+0007EE  2FF004     MOV #0xFF00, W4
+0007F0  881604     MOV W4, TRISA
+60:                	LATA  = 0xFF0E;  //Enciendo los 1,2 y 3 
+0007F2  2FF0E4     MOV #0xFF0E, W4
+0007F4  881624     MOV W4, LATA
+61:                		
+62:                	/* Initialize UART2*/
+63:                	InitUART2();
+0007F6  07FE0F     RCALL InitUART2
+64:                
+65:                	/* Initialize ADC  */
+66:                	Init_ADC();
+0007F8  07FD6E     RCALL Init_ADC
+67:                
+68:                	/* Inicializar Timers necesarios */
+69:                	Init_Timer4();
+0007FA  07FE29     RCALL Init_Timer4
+70:                
+71:                #ifdef USAR_LCD
+72:                	/* Inicializar LCD Display */
+73:                	Init_LCD();
+0007FC  07FE75     RCALL Init_LCD
+74:                #endif // USAR_LCD
+75:                }

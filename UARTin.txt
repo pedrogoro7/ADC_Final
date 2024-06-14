@@ -1,0 +1,26 @@
+// Espera 0 segundos, envía paquete con QTY
+
+FF 09 FD
+wait 1 sec
+FE 09 03 02 80 44 15 96 4F
+wait 1 sec
+FE 08 03 02 80 41 81 4B
+wait 1 sec
+FE 08 03 02 80 43 81 4D
+wait 1 sec
+FE 08 03 02 80 42 81 4C
+wait 1 sec
+FE 08 03 02 80 45 81 4F
+wait 1 sec
+FE 08 03 02 80 46 81 50
+wait 1 sec
+FE 08 03 02 80 46 81 51
+
+//OTRO EJEMPLO (COMENTADO)
+
+// Espera 0 milisegundos, envía paquete "def" (directamente escribiendo caracteres ascii)
+
+//wait 0 ms
+
+//"def"
+

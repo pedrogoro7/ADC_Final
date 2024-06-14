@@ -1,0 +1,89 @@
+## SCL Builder Setup File: Do not edit!!
+
+## VERSION: MPLAB X
+## FORMAT:  v2.00.01
+## DEVICE:  DSPIC33FJ256GP710
+
+## PINREGACTIONS
+cyc
+No Repeat
+--
+&
+## ADVPINREGACTIONS
+--
+&
+--
+COND2
+Any
+
+
+
+0
+cyc
+
+--
+&
+## CLOCK
+&
+## STIMULUSFILE
+
+U2RXREG
+Message
+0
+2
+C:\Users\mero2\OneDrive\Documentos\APU y Lic. en sistemas\Arquitectura de computadoras\Practica\TP Final\proyectobase5.X\UARTin.txt
+Pkt
+No
+
+--
+&
+## RESPONSEFILE
+&
+## ASYNCH
+Pin
+RD13
+Set High
+
+
+-1
+--
+Pin
+RD13
+Set Low
+
+
+-1
+--
+Pin
+RD6
+Set High
+
+
+-1
+--
+Pin
+RD6
+Set Low
+
+
+-1
+--
+Pin
+RD7
+Set High
+
+
+-1
+--
+Pin
+RD7
+Set Low
+
+
+-1
+--
+&
+## ADVANCEDSCL
+
+1
+&
