@@ -180,7 +180,7 @@ void verificarMensaje(){
 }
 
 void armarMensajeD() {
-    unsigned int bccl,bcch= 0;
+    unsigned int bccl,bcch= 0;//Valor Checksum Alto y Bajo
     unsigned int checksum;//checksum
     unsigned int i = 0;
     unsigned int j = 0;
