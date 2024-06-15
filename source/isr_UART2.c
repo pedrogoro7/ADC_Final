@@ -21,13 +21,13 @@
 #define BRGVAL ((FCY / BAUDRATE) / 16) -1
 
 volatile unsigned char caracter;
-int cant , contador  = 0;   //Cantidad de caracteres a enviar
+int cant , i, Qty, contador  = 0;   //Cantidad de caracteres a enviar
 int esPrimero = 1;
 int estado = 0;
 unsigned int valor;
 volatile unsigned char uart_update;
-extern int mensajeRecepcion[];
-extern int mensajeTransmicion[];
+extern int bufferRX[];
+extern int bufferTX[];
 extern int terminoRecepcion;
 
 /*---------------------------------------------------------------------
@@ -40,30 +40,31 @@ extern int terminoRecepcion;
 
 void __attribute__((interrupt, auto_psv)) _U2RXInterrupt( void )
 {
-
     IFS1bits.U2RXIF = 0;
     
     if (!estado){
-        mensajeRecepcion[contador] = U2RXREG;
-        if (mensajeRecepcion[contador] == 0x00FE){
+        bufferRX[i] = U2RXREG;
+        if (bufferRX[i] == 0x00FE){
             estado = 1;
         }
     }
     if (estado){
-        if ((esPrimero) && (mensajeRecepcion[contador] != 0x00FE)){
-            mensajeRecepcion[contador] = U2RXREG;    //meto segundo valor al registro
-            esPrimero = 0;                  //bajo bandera
-            cant = mensajeRecepcion[contador];       //tomo la cantidad de datos total
+        //if ((esPrimero) && (bufferRX[i] != 0x00FE)){
+        if ((i == 1) && (bufferRX[i] != 0x00FE)){
+            bufferRX[i] = U2RXREG;    //Cargo Qty al registro
+            //esPrimero = 0;                  //bajo bandera
+            Qty = bufferRX[i];       //tomo la cantidad de datos total
+        } else {
+            if (i < (Qty-1)){
+                bufferRX[i] = U2RXREG;
+                }
         }
-        else{
-            mensajeRecepcion[contador] = U2RXREG;
-        }
-        contador++;
-        if(contador == cant){
-            contador = 0;   //resetea valores
-            esPrimero = 1;  //para el proximo
+        i++;
+        if(i == Qty){
+            i = 0;   //resetea valores
+            //esPrimero = 1;  //para el proximo
             estado = 0;     //mensaje
-            terminoRecepcion = 1;
+            terminoRecepcion = 1; //Bandera Fin Recepcion
         }
     }
 }
@@ -74,14 +75,15 @@ void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 	//Atención. Se debe modificar para que no emita reiteradamente
 	//caracteres
     IFS1bits.U2TXIF = 0;
-    cant = mensajeTransmicion[1];//El segundo valor del arreglo trae la cantidad a transmitir
-    if(contador < cant)  // de 0 hasta cantidad de datos
+    Qty = bufferTX[1];//Cantidad de datos a enviar
+    if(i < Qty)  // de 0 hasta cantidad de datos
     {
-        U2TXREG = mensajeTransmicion[contador];	//Simple ECO
-        contador++;
+        U2TXREG = bufferTX[i];	//Simple ECO
+        i++;
     }
     else{
-        contador = 0;
+        i = 0;
+        Qty = 0;
     }
 }
 

@@ -35,8 +35,8 @@
 #define TRUE	1
 #define MAX 256
 
-extern int contadorEjes; //Contador de ejes general
-unsigned int masDeDosEjes; //Contador para autos con mas de dos ejes
+extern int cantEjes; //Contador de ejes general
+unsigned int masDosEjes; //Contador para autos con mas de dos ejes
 extern int velocidad;
 unsigned int nAuto;
 
@@ -65,8 +65,8 @@ dato dataLogger[MAX];*/
 
 int counterTog = 0;
 int terminoRecepcion;
-unsigned int mensajeRecepcion[MAX];
-unsigned int mensajeTransmicion[MAX];
+unsigned int bufferRX[MAX];
+unsigned int bufferTX[MAX];
 int msEnviar;
 
 
@@ -102,8 +102,8 @@ void llenarArreglo()
         dataLogger[nAuto].timeStamp.minutos=30;
         dataLogger[nAuto].timeStamp.segundos=10*i;
         dataLogger[nAuto].cantEjes= 1+i;
-        nAuto++; //dos vehiculos
-        masDeDosEjes = 1; //uno tiene mas de dos ejes
+        nAuto++; //sumo cantidad de vehiculos cargados
+        masDosEjes = 1; //uno tiene mas de dos ejes
     }
 }
 
@@ -112,10 +112,10 @@ void agregarDatos(){
     dataLogger[nAuto].timeStamp.hora=hours;
     dataLogger[nAuto].timeStamp.minutos=minutes;
     dataLogger[nAuto].timeStamp.segundos=seconds;
-    dataLogger[nAuto].cantEjes= contadorEjes;
+    dataLogger[nAuto].cantEjes= cantEjes;
     nAuto++;
-    if (contadorEjes > 2){
-        masDeDosEjes++;
+    if (cantEjes > 2){
+        masDosEjes++;
     }   
 }
 
@@ -154,13 +154,15 @@ unsigned int calcularChecksum(unsigned int cant, unsigned int mensaje[]){
 void verificarMensaje(){
     unsigned int check,valor,Qty;
     
-    check = calcularChecksum(mensajeRecepcion[1],mensajeRecepcion);
-    Qty = mensajeRecepcion[1];
-    valor = mensajeRecepcion[Qty - 2];//Parte alta del checksum recibido
+    check = calcularChecksum(bufferRX[1],bufferRX);
+    Qty = bufferRX[1];
+    valor = bufferRX[Qty - 2];//Parte alta del checksum recibido
     valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
-    valor = valor + mensajeRecepcion[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
+    valor = valor + bufferRX[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
     if (check == valor){
-        msEnviar =  mensajeRecepcion[5]; //Si es correcto enviamos el argumento VER DE HACERLO CON UNA ESTRUCTURA DE DATOS
+        msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento VER DE HACERLO CON UNA ESTRUCTURA DE DATOS
+    } else {
+        msEnviar = 0x0047;//si no enviamos NACK MENSAJE ERRONEO
     }
     /*if (mensajeRecepcion[1] == Qty){
     
@@ -276,7 +278,7 @@ void resetear(){
         dataLogger[i].cantEjes = 0;
         i++;
     }
-    masDeDosEjes = 0;
+    masDosEjes = 0;
     nAuto = 0;
 }
 /*---------------------------------------------------------------------
@@ -297,7 +299,7 @@ void procesarMensaje(){
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'C': 
-            armarMensaje(9,masDeDosEjes);//Consultar cantidad de vehículos con más de dos ejes.
+            armarMensaje(9,masDosEjes);//Consultar cantidad de vehículos con más de dos ejes.
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'D': 
