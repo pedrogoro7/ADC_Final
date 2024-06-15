@@ -84,8 +84,8 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
     }
     if((PORTDbits.RD13)&& (!PORTDbits.RD6)&&(PORTDbits.RD7)&&(contadorEjes == 1)){
             detenerTimmer();
-            velocidad = 36 * (30/quantum);
-            if (quantum < 18){
+            velocidad = 36 * (40/quantum);//VEER FORMULAR 
+            if (quantum < 18){ //CONDICION SI VELOCIDAD EXCEDE LOS 60KM/H
                 unsigned int k = 0;
                 PORTAbits.RA0 = 1;
                 while (k<5000){
