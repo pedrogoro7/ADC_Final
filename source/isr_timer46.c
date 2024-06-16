@@ -86,7 +86,7 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
             detenerTimmer();
             velocidad = 36 * (40/quantum);// 1m/s = 36km/h se multiplica por 36 para convertir de ms a km
             //if (quantum < 18){ //CONDICION SI VELOCIDAD EXCEDE LOS 60KM/H
-            if (velocidad > 0x003C){ //CONDICION SI VELOCIDAD EXCEDE LOS 60KM/H
+            if (velocidad > 60){ //CONDICION SI VELOCIDAD EXCEDE LOS 60KM/H
                 unsigned int k = 0;
                 PORTAbits.RA0 = 1;
                 while (k<5000){
