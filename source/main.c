@@ -44,11 +44,6 @@ typedef struct{
     unsigned int hora;
     unsigned int minutos;
     unsigned int segundos;
-} time;
-unsigned int time;
-
-typedef struct{
-    struct time timeStamp ;
     unsigned int velocidad;
     unsigned int cantEjes;       
 } dato;
@@ -98,9 +93,9 @@ void llenarArreglo()
     while(i<2){
         i++;
         dataLogger[nAuto].velocidad= 50;
-        dataLogger[nAuto].timeStamp.hora=21;
-        dataLogger[nAuto].timeStamp.minutos=30;
-        dataLogger[nAuto].timeStamp.segundos=10*i;
+        dataLogger[nAuto].hora=21;
+        dataLogger[nAuto].minutos=30;
+        dataLogger[nAuto].segundos=10*i;
         dataLogger[nAuto].cantEjes= 1+i;
         nAuto++; //sumo cantidad de vehiculos cargados
         masDosEjes = 1; //uno tiene mas de dos ejes
@@ -109,9 +104,9 @@ void llenarArreglo()
 
 void agregarDatos(){
     dataLogger[nAuto].velocidad= velocidad;
-    dataLogger[nAuto].timeStamp.hora=hours;
-    dataLogger[nAuto].timeStamp.minutos=minutes;
-    dataLogger[nAuto].timeStamp.segundos=seconds;
+    dataLogger[nAuto].hora=hours;
+    dataLogger[nAuto].minutos=minutes;
+    dataLogger[nAuto].segundos=seconds;
     dataLogger[nAuto].cantEjes= cantEjes;
     nAuto++;
     if (cantEjes > 2){
@@ -179,10 +174,10 @@ void armarMensajeD() {
     bufferTX[5]= bufferRX[5];//Argumentos
 
     while(i<nAuto){
-    	if(bufferRX[6] == dataLogger[i].timeStamp.hora){
-            bufferTX[6+j] = dataLogger[i].timeStamp.hora;
-            bufferTX[7+j] = dataLogger[i].timeStamp.minutos;
-            bufferTX[8+j] = dataLogger[i].timeStamp.segundos;
+    	if(bufferRX[6] == dataLogger[i].hora){
+            bufferTX[6+j] = dataLogger[i].hora;
+            bufferTX[7+j] = dataLogger[i].minutos;
+            bufferTX[8+j] = dataLogger[i].segundos;
             bufferTX[9+j] = dataLogger[i].velocidad;
             bufferTX[10+j] = dataLogger[i].cantEjes;
             j = j + 5;
@@ -258,9 +253,9 @@ void resetear(){
     unsigned int i = 0;
     while(i < nAuto){
         dataLogger[i].velocidad= 0;
-        dataLogger[i].timeStamp.hora= 0;
-        dataLogger[i].timeStamp.minutos = 0;
-        dataLogger[i].timeStamp.segundos = 0;
+        dataLogger[i].hora= 0;
+        dataLogger[i].minutos = 0;
+        dataLogger[i].segundos = 0;
         dataLogger[i].cantEjes = 0;
         i++;
     }
