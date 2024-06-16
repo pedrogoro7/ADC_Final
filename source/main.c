@@ -160,25 +160,10 @@ void verificarMensaje(){
     valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
     valor = valor + bufferRX[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
     if (check == valor){
-        msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento VER DE HACERLO CON UNA ESTRUCTURA DE DATOS
+        msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento
     } else {
         msEnviar = 0x0047;//si no enviamos NACK MENSAJE ERRONEO
     }
-    /*if (mensajeRecepcion[1] == Qty){
-    
-    }
-    else{
-        valor = mensajeRecepcion[6];//Parte alta del checksum recibido
-        valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
-        valor = valor + mensajeRecepcion[7]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
-    }
-    if (check == valor){
-        msEnviar =  mensajeRecepcion[5]; //Si es correcto enviamos el argumento
-    }
-    else{
-        msEnviar = 0x0047;//si no enviamos NACK
-    }*/
-
 }
 
 void armarMensajeD() {
