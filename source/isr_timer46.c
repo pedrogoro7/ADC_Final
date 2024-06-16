@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ValPR1	39062
 #define ValPR4	39062
 #define ValPR6	5000 //1 ms
 
@@ -17,7 +18,7 @@ unsigned int contadorEjes = 0; //Contador de ejes general
 unsigned int velocidad;
 //unsigned int nAuto;
 
-unsigned int quantum;
+unsigned int quantum, flag_delay;
 /*
 typedef struct{
     unsigned int hora;
@@ -39,6 +40,13 @@ void detenerTimmer(){
     T6CONbits.TON=0;
 }
 
+void Espera(){
+    flag_delay = 1;
+    T1CONbits.TON = 1;
+    while (flag_delay == 1){
+        T1CONbits.TON = 0;
+    }
+}
 /*---------------------------------------------------------------------
   Function Name: llenarArreglo
   Description:   llena un arreglo
@@ -88,9 +96,7 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
             if (velocidad > 60){ //Excede 60KM/H?
                 unsigned int k = 0;
                 PORTAbits.RA0 = 1;
-                while (k<5000){
-                    k++; //tarda un milisegundo 
-                }r
+                Espera();//espera de 0.25 seg
                 PORTAbits.RA0 = 0;
             }
     }          
@@ -123,40 +129,31 @@ void __attribute__((interrupt, auto_psv)) _T4Interrupt( void )
 /*---------------------------------------------------------------------
   Function Name: Init_Timer4
   Description:   Initialize Timer4
-
 -----------------------------------------------------------------------*/
 void Init_Timer4( void )
 {
 	/* ensure Timer 4 is in reset state */
 	T4CON = 0;
 	T4CONbits.TCKPS = 3; //Prescaler 256
-
 	/* reset Timer 4 interrupt flag */
  	IFS1bits.T4IF = 0;
- 	
  	/* set Timer interrupt priority level */
 	IPC6bits.T4IP = 5;
-
 	/* enable Timer interrupt */
  	IEC1bits.T4IE = 1;
- 	  	
 	/* set Timer period register */
 	PR4 = ValPR4;
 	T4CONbits.TON = 1; 	//habilito Timer
 
 }
-
-
 /*---------------------------------------------------------------------
   Function Name: _T6Interrupt
   Description:   Timer6 Interrupt Handler
-
 -----------------------------------------------------------------------*/
 void __attribute__((interrupt, auto_psv)) _T6Interrupt( void )
 {
 	/* reset Timer 6 interrupt flag */
  	IFS2bits.T6IF = 0;
-	//T6CONbits.TON = 0;	//Deshabilito Timer6
     quantum++;
 }
 
@@ -167,22 +164,39 @@ void __attribute__((interrupt, auto_psv)) _T6Interrupt( void )
 -----------------------------------------------------------------------*/
 void Init_Timer6( void )
 {
-	
 	/* ensure Timer 6 is in reset state */
 	T6CON = 0;
 	T6CONbits.TCKPS = 1; //Prescaler 8
-
 	/* reset Timer 6 interrupt flag */
  	IFS2bits.T6IF = 0;
- 	
  	/* set Timer interrupt priority level */
 	IPC11bits.T6IP = 5;
-
 	/* enable Timer interrupt */
  	IEC2bits.T6IE = 1;
- 	  	
 	/* set Timer period register */
 	PR6 = ValPR6;
 	T6CONbits.TON = 0; 	//deshabilito Timer
+}
 
+void Init_Timer1( void )
+{
+	/* ensure Timer 1 is in reset state */
+	T1CON = 0;
+	T1CONbits.TCKPS = 3; //Prescaler 256
+	/* reset Timer 4 interrupt flag */
+ 	IFS0bits.T1IF = 0;
+ 	/* set Timer interrupt priority level */
+	IPC0bits.T1IP = 4;
+	/* enable Timer interrupt */
+ 	IEC0bits.T1IE = 1;
+	/* set Timer period register */
+	PR1 = ValPR1;
+}
+void __attribute__((interrupt, auto_psv)) _T1Interrupt( void )
+{
+	/* Timer interrumpe cada 0.25 seg */
+ 	IFS0bits.T1IF = 0;
+	T1CONbits.TON = 0; 	//Apago Timer
+    TMR1 = 0;
+    flag_delay = 0;
 }

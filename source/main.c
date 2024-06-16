@@ -187,30 +187,30 @@ void armarMensajeD() {
     unsigned int i = 0;
     unsigned int j = 0;
 
-    mensajeTransmicion[0] = mensajeRecepcion[0];//SOF; 0x00FE
-    mensajeTransmicion[2] = mensajeRecepcion[3];//Dts
-    mensajeTransmicion[3] = mensajeRecepcion[2];//Src
-    mensajeTransmicion[4]= 0x0080;//Sec
-    mensajeTransmicion[5]= mensajeRecepcion[5];//Argumentos
+    bufferTX[0] = bufferRX[0];//SOF; 0x00FE
+    bufferTX[2] = bufferRX[3];//Dts
+    bufferTX[3] = bufferRX[2];//Src
+    bufferTX[4]= 0x0080;//Sec
+    bufferTX[5]= bufferRX[5];//Argumentos
 
     while(i<nAuto){
-    	if(mensajeRecepcion[6] == dataLogger[i].timeStamp.hora){
-            mensajeTransmicion[6+j] = dataLogger[i].timeStamp.hora;
-            mensajeTransmicion[7+j] = dataLogger[i].timeStamp.minutos;
-            mensajeTransmicion[8+j] = dataLogger[i].timeStamp.segundos;
-            mensajeTransmicion[9+j] = dataLogger[i].velocidad;
-            mensajeTransmicion[10+j] = dataLogger[i].cantEjes;
+    	if(bufferRX[6] == dataLogger[i].timeStamp.hora){
+            bufferTX[6+j] = dataLogger[i].timeStamp.hora;
+            bufferTX[7+j] = dataLogger[i].timeStamp.minutos;
+            bufferTX[8+j] = dataLogger[i].timeStamp.segundos;
+            bufferTX[9+j] = dataLogger[i].velocidad;
+            bufferTX[10+j] = dataLogger[i].cantEjes;
             j = j + 5;
         }
         i++;      
     }
-    mensajeTransmicion[1] = 8 + j;//QTY
-    checksum = calcularChecksum(mensajeTransmicion[1],mensajeTransmicion);
+    bufferTX[1] = 8 + j;//QTY
+    checksum = calcularChecksum(bufferTX[1],bufferTX);
     bcch = checksum >>8;
     bccl = checksum << 8;
     bccl = bccl >> 8;
-    mensajeTransmicion[mensajeTransmicion[1]-2] = bcch;//BCCH
-    mensajeTransmicion[mensajeTransmicion[1]-1] = bccl;//BCCL   
+    bufferTX[bufferTX[1]-2] = bcch;//BCCH
+    bufferTX[bufferTX[1]-1] = bccl;//BCCL   
 }
 /*---------------------------------------------------------------------
   Function Name: armarMensaje
@@ -222,30 +222,30 @@ void armarMensaje( unsigned int cant , unsigned int msEnviar) {
     unsigned int bccl,bcch= 0;
     unsigned int checksum;
     
-    mensajeTransmicion[0] = mensajeRecepcion[0];//SOF; 0x0FE
-    mensajeTransmicion[1] = cant;//QTY; 8 o 9
-    mensajeTransmicion[2] = mensajeRecepcion[3];//Dts
-    mensajeTransmicion[3] = mensajeRecepcion[2];//Src
-    mensajeTransmicion[4]= 0x0080;//Sec
+    bufferTX[0] = bufferRX[0];//SOF; 0x0FE
+    bufferTX[1] = cant;//QTY; 8 o 9
+    bufferTX[2] = bufferRX[3];//Dts
+    bufferTX[3] = bufferRX[2];//Src
+    bufferTX[4]= 0x0080;//Sec
     if(cant == 9){
-        mensajeTransmicion[5]= mensajeRecepcion[5];//Argumentos
-        mensajeTransmicion[6] = msEnviar;//Datos
-        checksum = calcularChecksum(9,mensajeTransmicion);
+        bufferTX[5]= bufferRX[5];//Argumentos
+        bufferTX[6] = msEnviar;//Datos
+        checksum = calcularChecksum(9,bufferTX);
         bcch = checksum >>8;
         bccl = checksum << 8;
         bccl = bccl >> 8;
-        mensajeTransmicion[7] = bcch;//BCCH
-        mensajeTransmicion[8] = bccl;//BCCL
+        bufferTX[7] = bcch;//BCCH
+        bufferTX[8] = bccl;//BCCL
     }
     else {
-        mensajeTransmicion[5]= msEnviar;//Argumentos
-        checksum = calcularChecksum(8,mensajeTransmicion);
+        bufferTX[5]= msEnviar;//Argumentos
+        checksum = calcularChecksum(8,bufferTX);
         bccl = checksum << 8;
         bccl = bccl >> 8;
         checksum = checksum >>8;
         bcch = checksum ;
-        mensajeTransmicion[6] = bcch;//BCCH
-        mensajeTransmicion[7] = bccl;//BCCL
+        bufferTX[6] = bcch;//BCCH
+        bufferTX[7] = bccl;//BCCL
     }
 }
 /*---------------------------------------------------------------------
@@ -257,9 +257,10 @@ void armarMensaje( unsigned int cant , unsigned int msEnviar) {
 void encenderCamara(){
     unsigned int k=0;
     PORTAbits.RA3 = 1;
-    while (k<5000){
+    /*while (k<5000){
         k++; //tarda un milisegundo 
-    }
+    }*/
+    Espera();
     PORTAbits.RA3 = 0;
 }
 /*---------------------------------------------------------------------
