@@ -40,13 +40,13 @@ void detenerTimmer(){
     T6CONbits.TON=0;
 }
 
-void Espera(){
+/*void Espera(){
     flag_delay = 1;
     T1CONbits.TON = 1;
     while (flag_delay == 1){
         T1CONbits.TON = 0;
     }
-}
+}*/
 /*---------------------------------------------------------------------
   Function Name: llenarArreglo
   Description:   llena un arreglo
@@ -96,7 +96,10 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
             if (velocidad > 60){ //Excede 60KM/H?
                 unsigned int k = 0;
                 PORTAbits.RA0 = 1;
-                Espera();//espera de 0.25 seg
+                //Espera();//espera de 0.25 seg
+                while (k<5000){
+                    k++; //tarda un milisegundo 
+                }
                 PORTAbits.RA0 = 0;
             }
     }          
@@ -177,25 +180,25 @@ void Init_Timer6( void )
 	T6CONbits.TON = 0; 	//deshabilito Timer
 }
 
-void Init_Timer1( void )
+/*void Init_Timer1( void )
 {
-	/* ensure Timer 1 is in reset state */
+	/* ensure Timer 1 is in reset state
 	T1CON = 0;
 	T1CONbits.TCKPS = 3; //Prescaler 256
-	/* reset Timer 4 interrupt flag */
+	// reset Timer 4 interrupt flag
  	IFS0bits.T1IF = 0;
- 	/* set Timer interrupt priority level */
+ 	// set Timer interrupt priority leve
 	IPC0bits.T1IP = 4;
-	/* enable Timer interrupt */
+	// enable Timer interrupt
  	IEC0bits.T1IE = 1;
-	/* set Timer period register */
+	// set Timer period register
 	PR1 = ValPR1;
-}
-void __attribute__((interrupt, auto_psv)) _T1Interrupt( void )
+}*/
+/*void __attribute__((interrupt, auto_psv)) _T1Interrupt( void )
 {
-	/* Timer interrumpe cada 0.25 seg */
+	// Timer interrumpe cada 0.25 seg
  	IFS0bits.T1IF = 0;
 	T1CONbits.TON = 0; 	//Apago Timer
     TMR1 = 0;
     flag_delay = 0;
-}
+}*/

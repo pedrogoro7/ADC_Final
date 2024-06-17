@@ -31,6 +31,7 @@ void config( void )
 	/* Inicializar Timers necesarios */
 	Init_Timer4();
     Init_Timer6();
+    //Init_Timer1();
     
     /*Todos los pines de todos los puertos como digitales*/
     AD1PCFGH = 0XFFFF;

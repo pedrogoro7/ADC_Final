@@ -183,7 +183,7 @@ void armarMensajeD() {
         i++;      
     }
     bufferTX[1] = 8 + j;//QTY total del mensaje
-    Qty = bufferTX[1]
+    Qty = bufferTX[1];
     checksum = calcularChecksum(bufferTX[1],bufferTX);
     chsh = checksum >> 8;
     chsl = checksum << 8;
@@ -236,10 +236,10 @@ void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
 void encenderCamara(){
     //unsigned int k=0;
     PORTAbits.RA3 = 1;
-    /*while (k<5000){
+    while (k<5000){
         k++; //tarda un milisegundo 
-    }*/
-    Espera();
+    }
+    //Espera();
     PORTAbits.RA3 = 0;
 }
 /*---------------------------------------------------------------------
