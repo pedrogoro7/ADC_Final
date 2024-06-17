@@ -62,7 +62,7 @@ int counterTog = 0;
 int terminoRecepcion;
 unsigned int bufferRX[MAX];
 unsigned int bufferTX[MAX];
-int msEnviar,Qty;
+int msEnviar;
 
 
 void UpdateClock (void)
@@ -120,25 +120,25 @@ void agregarDatos(){
   Precondiciones: cant = C; mensaje[0..C]
   Poscondiciones: checksum = acumulador = A; return A;
 -----------------------------------------------------------------------*/
-unsigned int calcularChecksum(unsigned int cant, unsigned int mensaje[]){
-    unsigned int acumulador =0;
+unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
+    unsigned int checksum =0;
     unsigned int var ;
     unsigned int i= 0;
     
-    while (i < (cant-3)){
+    while (i < (Qty-3)){
         var = mensaje[i];//Depositamos lo que esta en la posicion[0,2,4..n] del arreglo
         var = var <<8; //Dezplazamos hacia izquierda; ejemplo: 0x00FE quedaria 0xFE00
         var = var + mensaje[i+1];//sumamos; ejemplo: lo posicionado en [0]+[1] = 0xFE00 + 0x0080 = 0xFE08
         i+=2;
-        acumulador+= var;//sumamos y guardamos en acumulador; ejemplo: 0x0000 + 0xFE08 = 0xFE08
+        checksum+= var;//sumamos y guardamos en acumulador; ejemplo: 0x0000 + 0xFE08 = 0xFE08
     }
     
-    if(cant%2 == 1){// Verifico si la cantidad de elementos del mensaje es impar.
-        var = mensaje[cant - 3];//tomo el ultimo caracter util del mensaje descartando valosres correspondientes al Checsum
+    if(Qty%2 == 1){// Verifico si la cantidad de elementos del mensaje es impar.
+        var = mensaje[Qty - 3];//tomo el ultimo caracter util del mensaje descartando valosres correspondientes al Checsum
         var = var << 8;//Desplazo 8 bits a la Izquierda
-        acumulador += var;//lo sumo al acumulador
+        checksum += var;//lo sumo al acumulador
     }
-    return acumulador;
+    return checksum;
 }
 /*---------------------------------------------------------------------
   Function Name: verificarMensaje
@@ -147,7 +147,7 @@ unsigned int calcularChecksum(unsigned int cant, unsigned int mensaje[]){
   Poscondiciones: msEnviar = MS; return MS; MS puede ser(41,42,43,44,45,46 o 47 si hay algun tipo de error)
 -----------------------------------------------------------------------*/
 void verificarMensaje(){
-    unsigned int check,valor;
+    unsigned int check,valor,Qty;
     
     check = calcularChecksum(bufferRX[1],bufferRX);
     Qty = bufferRX[1];
@@ -198,16 +198,16 @@ void armarMensajeD() {
   Precondiciones: cant = C; msEnviar = MS;
   Poscondiciones: mensajeTransmicion = MT; MT[0..C]
 -----------------------------------------------------------------------*/
-void armarMensaje( unsigned int cant , unsigned int msEnviar) {
+void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
     unsigned int bccl,bcch= 0;
     unsigned int checksum;
     
     bufferTX[0] = bufferRX[0];//SOF; 0x0FE
-    bufferTX[1] = cant;//QTY; 8 o 9
+    bufferTX[1] = Qty;//QTY; 8 o 9
     bufferTX[2] = bufferRX[3];//Dts
     bufferTX[3] = bufferRX[2];//Src
     bufferTX[4]= 0x0080;//Sec
-    if(cant == 9){
+    if(Qty == 9){
         bufferTX[5]= bufferRX[5];//Argumentos
         bufferTX[6] = msEnviar;//Datos
         checksum = calcularChecksum(9,bufferTX);
