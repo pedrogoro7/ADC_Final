@@ -75,7 +75,7 @@ void UpdateClock (void)
     {
         hours=0;
     }
-
+    //Actualizar Hora Sistema en Display
 }
 
 void llenarArreglo()
