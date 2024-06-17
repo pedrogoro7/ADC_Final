@@ -3,7 +3,7 @@
  FileName:        main.c
  Dependencies:    p33FJ256GP710.h
  Processor:       dsPIC33F
- Compiler:        MPLABÂ® C30 v2.01 or higher
+ Compiler:        MPLAB® C30 v2.01 or higher
 
  Ejemplo de funcionamiento de:
  	Timer1
@@ -17,10 +17,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  Richard Fischer   07/14/05  Initial Release
  Priyabrata Sinha  01/27/06  Ported to non-prototype devices 
- Ricardo LÃ³pez     05/24/10  AdaptaciÃ³n para uso general
- SebastiÃ¡n Wahler  08/05/13  Nuevas adaptaciones
- Marcelo GÃ³mez     09/03/14  Portado a MPLAB.X
- SebastiÃ¡n Wahler  04/06/19  Simplificado sin Placa
+ Ricardo López     05/24/10  Adaptación para uso general
+ Sebastián Wahler  08/05/13  Nuevas adaptaciones
+ Marcelo Gómez     09/03/14  Portado a MPLAB.X
+ Sebastián Wahler  04/06/19  Simplificado sin Placa
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **********************************************************************/
@@ -33,10 +33,10 @@
 #include <stdlib.h>
 
 #define TRUE	1
-#define MAX 256
+#define MAX 100
 
-extern int cantEjes; //Contador de ejes general
-unsigned int masDosEjes; //Contador para autos con mas de dos ejes
+extern int contadorEjes; //Contador de ejes general
+unsigned int masDeDosEjes,masDosEjes; //Contador para autos con mas de dos ejes
 extern int velocidad;
 unsigned int nAuto;
 
@@ -48,15 +48,6 @@ typedef struct{
     unsigned int cantEjes;       
 } dato;
 dato dataLogger[MAX];
-
-/*typedef struct{
-    unsigned int hora;
-    unsigned int minutos;
-    unsigned int segundos;
-    unsigned int velocidad;
-    unsigned int cantEjes;       
-} dato;
-dato dataLogger[MAX];*/
 
 int counterTog = 0;
 int terminoRecepcion;
@@ -84,7 +75,7 @@ void UpdateClock (void)
     {
         hours=0;
     }
-    //enviar por PORTA la Hora
+
 }
 
 void llenarArreglo()
@@ -97,8 +88,8 @@ void llenarArreglo()
         dataLogger[nAuto].minutos=30;
         dataLogger[nAuto].segundos=10*i;
         dataLogger[nAuto].cantEjes= 1+i;
-        nAuto++; //sumo cantidad de vehiculos cargados
-        masDosEjes = 1; //uno tiene mas de dos ejes
+        nAuto++; //dos vehiculos
+        masDeDosEjes = 1; //uno tiene mas de dos ejes
     }
 }
 
@@ -107,16 +98,18 @@ void agregarDatos(){
     dataLogger[nAuto].hora=hours;
     dataLogger[nAuto].minutos=minutes;
     dataLogger[nAuto].segundos=seconds;
-    dataLogger[nAuto].cantEjes= cantEjes;
+    dataLogger[nAuto].cantEjes= contadorEjes;
     nAuto++;
-    if (cantEjes > 2){
-        masDosEjes++;
+    if (contadorEjes > 2){
+        masDeDosEjes++;
     }   
 }
 
 /*---------------------------------------------------------------------
   Function Name: calcularChecksum
   Description:   calcula el checksum
+  Precondiciones: cant = C; mensaje[0..C]
+  Poscondiciones: checksum = acumulador = A; return A;
 -----------------------------------------------------------------------*/
 unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
     unsigned int checksum =0;
@@ -132,7 +125,7 @@ unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
     }
     
     if(Qty%2 == 1){// Verifico si la cantidad de elementos del mensaje es impar.
-        var = mensaje[Qty - 3];//tomo el ultimo caracter util del mensaje descartando valosres correspondientes al Checsum
+        var = mensaje[Qty - 3];//tomo ultimo caracter util del mensaje descartando valores del Checsum
         var = var << 8;//Desplazo 8 bits a la Izquierda
         checksum += var;//lo sumo al acumulador
     }
@@ -233,18 +226,18 @@ void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
   Precondiciones: --
   Poscondiciones: --
 -----------------------------------------------------------------------*/
+
 void encenderCamara(){
-    //unsigned int k=0;
+    unsigned int k=0;
     PORTAbits.RA3 = 1;
     while (k<5000){
         k++; //tarda un milisegundo 
     }
-    //Espera();
     PORTAbits.RA3 = 0;
 }
 /*---------------------------------------------------------------------
   Function Name: resetear
-  Description:   Resetea la cantidad de vehÃ­culos a 0 y borrar todos los registros.
+  Description:   Resetea la cantidad de vehículos a 0 y borrar todos los registros.
   Precondiciones: --
   Poscondiciones: --
 -----------------------------------------------------------------------*/
