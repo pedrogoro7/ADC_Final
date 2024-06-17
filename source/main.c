@@ -62,7 +62,7 @@ int counterTog = 0;
 int terminoRecepcion;
 unsigned int bufferRX[MAX];
 unsigned int bufferTX[MAX];
-int msEnviar;
+int msEnviar,Qty;
 
 
 void UpdateClock (void)
@@ -147,7 +147,7 @@ unsigned int calcularChecksum(unsigned int cant, unsigned int mensaje[]){
   Poscondiciones: msEnviar = MS; return MS; MS puede ser(41,42,43,44,45,46 o 47 si hay algun tipo de error)
 -----------------------------------------------------------------------*/
 void verificarMensaje(){
-    unsigned int check,valor,Qty;
+    unsigned int check,valor;
     
     check = calcularChecksum(bufferRX[1],bufferRX);
     Qty = bufferRX[1];
@@ -235,7 +235,7 @@ void armarMensaje( unsigned int cant , unsigned int msEnviar) {
   Poscondiciones: --
 -----------------------------------------------------------------------*/
 void encenderCamara(){
-    unsigned int k=0;
+    //unsigned int k=0;
     PORTAbits.RA3 = 1;
     /*while (k<5000){
         k++; //tarda un milisegundo 
