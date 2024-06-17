@@ -162,7 +162,7 @@ void verificarMensaje(){
 }
 
 void armarMensajeD() {
-    unsigned int bccl,bcch= 0;//Valor Checksum Alto y Bajo
+    unsigned int chsl,chsh,Qty = 0;//Valor Checksum Alto y Bajo
     unsigned int checksum;//checksum
     unsigned int i = 0;
     unsigned int j = 0;
@@ -173,8 +173,9 @@ void armarMensajeD() {
     bufferTX[4]= 0x0080;//Sec
     bufferTX[5]= bufferRX[5];//Argumentos
 
-    while(i<nAuto){
-    	if(bufferRX[6] == dataLogger[i].hora){
+    while(i < nAuto){
+    	if(bufferRX[6] == dataLogger[i].hora) //Si la hora correponsde a la solicitada cargo bufferTX con los datos a enviar
+        {
             bufferTX[6+j] = dataLogger[i].hora;
             bufferTX[7+j] = dataLogger[i].minutos;
             bufferTX[8+j] = dataLogger[i].segundos;
@@ -184,13 +185,14 @@ void armarMensajeD() {
         }
         i++;      
     }
-    bufferTX[1] = 8 + j;//QTY
+    bufferTX[1] = 8 + j;//QTY total del mensaje
+    Qty = bufferTX[1]
     checksum = calcularChecksum(bufferTX[1],bufferTX);
-    bcch = checksum >>8;
-    bccl = checksum << 8;
-    bccl = bccl >> 8;
-    bufferTX[bufferTX[1]-2] = bcch;//BCCH
-    bufferTX[bufferTX[1]-1] = bccl;//BCCL   
+    chsh = checksum >> 8;
+    chsl = checksum << 8;
+    chsl = chsl >> 8;
+    bufferTX[Qty-2] = chsh;//Cargo Checsum parte Alta en mensaje
+    bufferTX[Qty-1] = chsl;//Cargo Checsum parte Baja en mensaje
 }
 /*---------------------------------------------------------------------
   Function Name: armarMensaje
@@ -199,33 +201,33 @@ void armarMensajeD() {
   Poscondiciones: mensajeTransmicion = MT; MT[0..C]
 -----------------------------------------------------------------------*/
 void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
-    unsigned int bccl,bcch= 0;
+    unsigned int chsl,chsh= 0;
     unsigned int checksum;
     
-    bufferTX[0] = bufferRX[0];//SOF; 0x0FE
-    bufferTX[1] = Qty;//QTY; 8 o 9
+    bufferTX[0] = bufferRX[0];//SOF = 0x0FE
+    bufferTX[1] = Qty;//QTY; 8 o 9 depende del comando que se recibio
     bufferTX[2] = bufferRX[3];//Dts
     bufferTX[3] = bufferRX[2];//Src
     bufferTX[4]= 0x0080;//Sec
     if(Qty == 9){
         bufferTX[5]= bufferRX[5];//Argumentos
-        bufferTX[6] = msEnviar;//Datos
-        checksum = calcularChecksum(9,bufferTX);
-        bcch = checksum >>8;
-        bccl = checksum << 8;
-        bccl = bccl >> 8;
-        bufferTX[7] = bcch;//BCCH
-        bufferTX[8] = bccl;//BCCL
+        bufferTX[6] = msEnviar;//Dato solcitado 
+        checksum = calcularChecksum(Qty,bufferTX);
+        chsh = checksum >>8;
+        chsl = checksum << 8;
+        chsl = chsl >> 8;
+        bufferTX[7] = chsh;//BCCH
+        bufferTX[8] = chsl;//BCCL
     }
-    else {
+    else { //sino no es 9 el Qty tiene que ser 8 para ACK o NACK
         bufferTX[5]= msEnviar;//Argumentos
-        checksum = calcularChecksum(8,bufferTX);
-        bccl = checksum << 8;
-        bccl = bccl >> 8;
+        checksum = calcularChecksum(Qty,bufferTX);
+        chsl = checksum << 8;
+        chsl = chsl >> 8;
         checksum = checksum >>8;
-        bcch = checksum ;
-        bufferTX[6] = bcch;//BCCH
-        bufferTX[7] = bccl;//BCCL
+        chsh = checksum ;
+        bufferTX[6] = chsh;//Cheksum parte Alta
+        bufferTX[7] = chsl;//Cheksum parte Baja
     }
 }
 /*---------------------------------------------------------------------
