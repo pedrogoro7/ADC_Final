@@ -117,8 +117,6 @@ void agregarDatos(){
 /*---------------------------------------------------------------------
   Function Name: calcularChecksum
   Description:   calcula el checksum
-  Precondiciones: cant = C; mensaje[0..C]
-  Poscondiciones: checksum = acumulador = A; return A;
 -----------------------------------------------------------------------*/
 unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
     unsigned int checksum =0;
@@ -143,8 +141,7 @@ unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
 /*---------------------------------------------------------------------
   Function Name: verificarMensaje
   Description:   verifica el mensaje recibido
-  Precondiciones: --
-  Poscondiciones: msEnviar = MS; return MS; MS puede ser(41,42,43,44,45,46 o 47 si hay algun tipo de error)
+  msEnviar = MS; return MS; MS puede ser(41,42,43,44,45,46 o 47 si hay algun tipo de error)
 -----------------------------------------------------------------------*/
 void verificarMensaje(){
     unsigned int check,valor,Qty;
