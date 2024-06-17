@@ -160,7 +160,6 @@ void __attribute__((interrupt, auto_psv)) _T6Interrupt( void )
 /*---------------------------------------------------------------------
   Function Name: Init_Timer6
   Description:   Initialize Timer6
-
 -----------------------------------------------------------------------*/
 void Init_Timer6( void )
 {

@@ -84,7 +84,7 @@ void UpdateClock (void)
     {
         hours=0;
     }
-
+    //enviar por PORTA la Hora
 }
 
 void llenarArreglo()
