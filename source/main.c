@@ -33,10 +33,10 @@
 #include <stdlib.h>
 
 #define TRUE	1
-#define MAX 100
+#define MAX 256
 
 extern int contadorEjes; //Contador de ejes general
-unsigned int masDeDosEjes,masDosEjes; //Contador para autos con mas de dos ejes
+unsigned int masDosEjes; //Contador para autos con mas de dos ejes
 extern int velocidad;
 unsigned int nAuto;
 
@@ -81,15 +81,15 @@ void UpdateClock (void)
 void llenarArreglo()
 {
     unsigned int i=0;
-    while(i<2){
+    while(i<10){
         i++;
-        dataLogger[nAuto].velocidad= 50;
-        dataLogger[nAuto].hora=21;
-        dataLogger[nAuto].minutos=30;
-        dataLogger[nAuto].segundos=10*i;
-        dataLogger[nAuto].cantEjes= 1+i;
+        dataLogger[nAuto].velocidad= rand() % 101;//15*i;
+        dataLogger[nAuto].hora = rand() % 25;//21;
+        dataLogger[nAuto].minutos = rand() % 61;//30;
+        dataLogger[nAuto].segundos = rand() % 61;//10*i;
+        dataLogger[nAuto].cantEjes =  rand() % 7;//1+i;
         nAuto++; //dos vehiculos
-        masDeDosEjes = 1; //uno tiene mas de dos ejes
+        masDosEjes = 1; //uno tiene mas de dos ejes
     }
 }
 
@@ -101,7 +101,7 @@ void agregarDatos(){
     dataLogger[nAuto].cantEjes= contadorEjes;
     nAuto++;
     if (contadorEjes > 2){
-        masDeDosEjes++;
+        masDosEjes++;
     }   
 }
 
