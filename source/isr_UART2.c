@@ -54,12 +54,13 @@ void __attribute__((interrupt, auto_psv)) _U2RXInterrupt( void )
             //esPrimero = 0;                  //bajo bandera
             Qty = bufferRX[i];       //tomo la cantidad de datos total
         } else {
-            if (i < (Qty-1)){
+            if (i < (Qty)){
                 bufferRX[i] = U2RXREG;
                 }
         }
         i++;
         if(i == Qty){
+            //bufferRX[i] = U2RXREG;//
             i = 0;   //resetea valores
             //esPrimero = 1;  //para el proximo
             estado = 0;     //mensaje
@@ -81,6 +82,7 @@ void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
         i++;
     }
     else{
+        U2TXREG = bufferTX[i];
         i = 0;
         Qty = 0;
     }

@@ -81,19 +81,35 @@ void UpdateClock (void)
 
 void llenarArreglo()
 {
-    srand(time(NULL));
     unsigned int i=0;
-    while(i<10){
+    unsigned int A = 3658;
+    unsigned int C = 61523;
+    unsigned int M = 15866;
+    unsigned int seed = 1;
+    while(i<11)
+    {
         i++;
-        dataLogger[nAuto].velocidad= 20 + rand() % (110 - 20 + 1);//15*i;
-        //El operador % (110 - 20 + 1) limita este número al rango de 0 a 90, ya que (110 - 20 + 1) es igual a 91.
-        //Al sumar 20 al resultado, ajustamos el rango para que esté entre 20 y 110.
-        dataLogger[nAuto].hora = rand() % 25;//21;
-        dataLogger[nAuto].minutos = rand() % 61;//30;
-        dataLogger[nAuto].segundos = rand() % 61;//10*i;
-        dataLogger[nAuto].cantEjes =  rand() % 7;//1+i;
+        seed = ((A * seed + C) % M);
+        dataLogger[nAuto].velocidad = seed % 110;   //1 + (15 * i);
+        dataLogger[nAuto].hora = seed % 25;//i * 21;
+        dataLogger[nAuto].minutos = seed % 61;//30;
+        seed = ((A * seed + C) % M);
+        dataLogger[nAuto].segundos = seed % 61;//10*i;
+        if ((i > 2) && (i < 5)){
+            dataLogger[nAuto].cantEjes = 2;
+        } else {
+            if (i == 6 ){
+                dataLogger[nAuto].cantEjes = 1;
+            } else {
+                dataLogger[nAuto].cantEjes = 3;
+            }
+        }
+        if (i == 10 ){
+                dataLogger[nAuto].cantEjes = 2;
+            }
         nAuto++; //dos vehiculos
         masDosEjes = 1; //uno tiene mas de dos ejes
+        /**/
     }
 }
 
@@ -178,6 +194,14 @@ void armarMensajeD() {
             j = j + 5;
         }
         i++;      
+    }
+    if (i == 0){
+        bufferTX[6+j] = 0;
+        bufferTX[7+j] = 0;
+        bufferTX[8+j] = 0;
+        bufferTX[9+j] = 0;
+        bufferTX[10+j] = 0;
+        j = j + 5;
     }
     bufferTX[1] = 8 + j;//QTY total del mensaje
     Qty = bufferTX[1];
