@@ -195,7 +195,8 @@ void armarMensajeD() {
         }
         i++;      
     }
-    if (i == 0){
+    if (i == 0)
+    {//Si en la hora solicitada no existen 0 nAuto cargo mensaje en 0
         bufferTX[6+j] = 0;
         bufferTX[7+j] = 0;
         bufferTX[8+j] = 0;
