@@ -31,6 +31,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>//libreria para sacar hora, minuto y segundos aleatorio
 
 #define TRUE	1
 #define MAX 256
@@ -80,10 +81,13 @@ void UpdateClock (void)
 
 void llenarArreglo()
 {
+    srand(time(NULL));
     unsigned int i=0;
     while(i<10){
         i++;
-        dataLogger[nAuto].velocidad= rand() % 101;//15*i;
+        dataLogger[nAuto].velocidad= 20 + rand() % (110 - 20 + 1);//15*i;
+        //El operador % (110 - 20 + 1) limita este número al rango de 0 a 90, ya que (110 - 20 + 1) es igual a 91.
+        //Al sumar 20 al resultado, ajustamos el rango para que esté entre 20 y 110.
         dataLogger[nAuto].hora = rand() % 25;//21;
         dataLogger[nAuto].minutos = rand() % 61;//30;
         dataLogger[nAuto].segundos = rand() % 61;//10*i;
