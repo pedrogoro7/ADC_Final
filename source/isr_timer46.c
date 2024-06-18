@@ -41,39 +41,6 @@ void detenerTimmer(){
 }
 
 /*---------------------------------------------------------------------
-  Function Name: llenarArreglo
-  Description:   llena un arreglo
-  Precondiciones: --
-  Poscondiciones: --
------------------------------------------------------------------------*/
-/*void llenarArreglo()
-{
-    unsigned int i=0;
-    while(i<2){
-        i++;
-        dataLogger[nAuto].velocidad= 0x002F;
-        dataLogger[nAuto].hora=21;
-        dataLogger[nAuto].minutos=30;
-        dataLogger[nAuto].segundos=10*i;
-        dataLogger[nAuto].cantEjes= 1+i;
-        nAuto++; //dos vehiculos
-        masDeDosEjes = 1; //uno tiene mas de dos ejes
-    }
-}
-
-void agregarDatos(){
-    dataLogger[nAuto].velocidad= velocidad;
-    dataLogger[nAuto].hora=hours;
-    dataLogger[nAuto].minutos=minutes;
-    dataLogger[nAuto].segundos=seconds;
-    dataLogger[nAuto].cantEjes= contadorEjes;
-    nAuto++;
-    if (contadorEjes > 2){
-        masDeDosEjes++;
-    }   
-}
-*/
-/*---------------------------------------------------------------------
   Function Name: _CNInterrupt
   Description:   CN Interrupt Handler
 -----------------------------------------------------------------------*/
