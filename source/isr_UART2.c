@@ -75,14 +75,16 @@ void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 	//Atención. Se debe modificar para que no emita reiteradamente
 	//caracteres
     IFS1bits.U2TXIF = 0;
-    Qty = bufferTX[1];//Cantidad de datos a enviar
+    if (i == 0){
+        Qty = bufferTX[1];//Cantidad de datos a enviar
+    }
     if(i < Qty)  // de 0 hasta cantidad de datos
     {
         U2TXREG = bufferTX[i];	//Simple ECO
         i++;
     }
     else{
-        U2TXREG = bufferTX[i];
+        //U2TXREG = bufferTX[i];
         i = 0;
         Qty = 0;
     }

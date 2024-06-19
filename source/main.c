@@ -1,4 +1,3 @@
-
 /**********************************************************************
  FileName:        main.c
  Dependencies:    p33FJ256GP710.h
@@ -35,11 +34,13 @@
 
 #define TRUE	1
 #define MAX 256
+#define MAXK 5000
 
 extern int contadorEjes; //Contador de ejes general
 unsigned int masDosEjes; //Contador para autos con mas de dos ejes
 extern int velocidad;
 unsigned int nAuto;
+unsigned int nuevoAut = 0;
 
 typedef struct{
     unsigned int hora;
@@ -120,6 +121,7 @@ void agregarDatos(){
     dataLogger[nAuto].segundos=seconds;
     dataLogger[nAuto].cantEjes= contadorEjes;
     nAuto++;
+    nuevoAut = 1;
     if (contadorEjes > 2){
         masDosEjes++;
     }   
@@ -164,7 +166,8 @@ void verificarMensaje(){
     valor = bufferRX[Qty - 2];//Parte alta del checksum recibido
     valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
     valor = valor + bufferRX[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
-    if (check == valor){
+    if ((check == valor)||(bufferRX[2] == 0x0003))
+    {//Verifico que el Checksum y el destinatario "03" coicidadan
         msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento
     } else {
         msEnviar = 0x0047;//si no enviamos NACK MENSAJE ERRONEO
@@ -195,7 +198,7 @@ void armarMensajeD() {
         }
         i++;      
     }
-    if (i == 0)
+    if (j == 0)
     {//Si en la hora solicitada no existen 0 nAuto cargo mensaje en 0
         bufferTX[6+j] = 0;
         bufferTX[7+j] = 0;
@@ -257,11 +260,12 @@ void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
 -----------------------------------------------------------------------*/
 
 void encenderCamara(){
-    unsigned int k=0;
+    //unsigned int k=0;
     PORTAbits.RA3 = 1;
-    while (k<5000){
+    for (unsigned int k = 0; k < MAXK; k++);
+    /*while (k<5000){
         k++; //tarda un milisegundo 
-    }
+    }*/
     PORTAbits.RA3 = 0;
 }
 /*---------------------------------------------------------------------
@@ -336,6 +340,19 @@ int main (void)
             terminoRecepcion = 0;
             verificarMensaje();
             procesarMensaje();
+        }
+        if (nuevoAut == 1){
+            //Enviar el ultimo Vehiculo detectado al Display conectado al PORTB
+            PORTB = dataLogger[nAuto].velocidad;
+            for (unsigned int k = 0; k < MAXK; k++);
+            PORTB = dataLogger[nAuto].cantEjes;
+            for (unsigned int k = 0; k < MAXK; k++);
+            PORTB = dataLogger[nAuto].hora;
+            for (unsigned int k = 0; k < MAXK; k++);
+            PORTB = dataLogger[nAuto].minutos;
+            for (unsigned int k = 0; k < MAXK; k++);
+            PORTB = dataLogger[nAuto].segundos;
+            nuevoAut = 0;
         }
         if(counterTog > 3)
             UpdateClock();  //Actualizar hora del dispositivo

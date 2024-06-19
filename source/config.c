@@ -46,4 +46,5 @@ void config( void )
     IEC1bits.CNIE = 1; //Enable CN interrupts
     TRISD = 0xFFFF; // PORTD como pulsadores
     TRISA = 0x0000; // PORTA como salida
+    TRISB = 0x0000; // PORTB como salida DISPLAY
 }

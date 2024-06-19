@@ -6,6 +6,7 @@
 #define ValPR1	39062
 #define ValPR4	39062
 #define ValPR6	5000 //1 ms
+#define MAXK	5000
 
 volatile unsigned char hours;
 volatile unsigned char minutes;
@@ -54,12 +55,13 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
             detenerTimmer();
             velocidad = 36 * (40/quantum);// 1m/s = 36km/h se multiplica por 36 para convertir de ms a km
             if (velocidad > 60){ //Excede 60KM/H?
-                unsigned int k = 0;
+                //unsigned int k = 0;
                 PORTAbits.RA0 = 1;
                 //Espera();//espera de 0.25 seg
-                while (k<5000){
+                for (unsigned int k = 0; k < MAXK; k++);
+                /*while (k<5000){
                     k++; //tarda un milisegundo 
-                }
+                }*/
                 PORTAbits.RA0 = 0;
             }
     }          
