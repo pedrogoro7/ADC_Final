@@ -166,7 +166,7 @@ void verificarMensaje(){
     valor = bufferRX[Qty - 2];//Parte alta del checksum recibido
     valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
     valor = valor + bufferRX[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
-    if ((check == valor)||(bufferRX[2] == 0x0003))
+    if ((check == valor) && (bufferRX[2] == 0x0003))
     {//Verifico que el Checksum y el destinatario "03" coicidadan
         msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento
     } else {
