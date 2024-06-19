@@ -72,8 +72,6 @@ void __attribute__((interrupt, auto_psv)) _U2RXInterrupt( void )
 //Rutina de INT para transmisión (no hace nada)
 void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 {
-	//Atención. Se debe modificar para que no emita reiteradamente
-	//caracteres
     IFS1bits.U2TXIF = 0;
     if (i == 0){
         Qty = bufferTX[1];//Cantidad de datos a enviar
