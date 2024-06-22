@@ -49,7 +49,7 @@ void __attribute__((interrupt, auto_psv)) _U2RXInterrupt( void )
     }
     if (estado){
         //if ((esPrimero) && (bufferRX[i] != 0x00FE)){
-        if ((i == 1) && (bufferRX[i] != 0x00FE)){
+        if ((i == 1)){
             bufferRX[i] = U2RXREG;    //Cargo Qty al registro
             //esPrimero = 0;                  //bajo bandera
             Qty = bufferRX[i];       //tomo la cantidad de datos total

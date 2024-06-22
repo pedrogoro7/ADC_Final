@@ -13,23 +13,8 @@ volatile unsigned char minutes;
 volatile unsigned char seconds;
 extern int counterTog;
 
-//#define MAX 240
 unsigned int contadorEjes = 0; //Contador de ejes general
-//unsigned int masDeDosEjes; //Contador para autos con mas de dos ejes
 unsigned int velocidad, quantum;
-//unsigned int nAuto;
-
-//unsigned int flag_delay;
-/*
-typedef struct{
-    unsigned int hora;
-    unsigned int minutos;
-    unsigned int segundos;
-    double velocidad;
-    unsigned int cantEjes;       
-} dato;
-dato dataLogger[MAX];
-*/
 
 void prenderTimmer(){
     TMR6 = 0;
@@ -50,18 +35,14 @@ void __attribute__((interrupt, auto_psv)) _CNInterrupt( void ) {
 	IFS1bits.CNIF=0;
     if (( PORTDbits.RD13)&& (PORTDbits.RD6) && (!PORTDbits.RD7)&&(contadorEjes < 1)){
         prenderTimmer();
+        //contadorEjes++;
     }
     if((PORTDbits.RD13)&& (!PORTDbits.RD6)&&(PORTDbits.RD7)&&(contadorEjes == 1)){
             detenerTimmer();
             velocidad = 36 * (40/quantum);// 1m/s = 36km/h se multiplica por 36 para convertir de ms a km
             if (velocidad > 60){ //Excede 60KM/H?
-                //unsigned int k = 0;
                 PORTAbits.RA0 = 1;
-                //Espera();//espera de 0.25 seg
                 for (unsigned int k = 0; k < MAXK; k++);
-                /*while (k<5000){
-                    k++; //tarda un milisegundo 
-                }*/
                 PORTAbits.RA0 = 0;
             }
     }          

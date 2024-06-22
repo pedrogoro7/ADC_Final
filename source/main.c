@@ -91,7 +91,7 @@ void llenarArreglo()
     {
         i++;
         seed = ((A * seed + C) % M);
-        dataLogger[nAuto].velocidad = seed % 110;   //1 + (15 * i);
+        dataLogger[nAuto].velocidad = seed % 150;   //1 + (15 * i);
         dataLogger[nAuto].hora = seed % 25;//i * 21;
         dataLogger[nAuto].minutos = seed % 61;//30;
         seed = ((A * seed + C) % M);
@@ -108,9 +108,10 @@ void llenarArreglo()
         if (i == 10 ){
                 dataLogger[nAuto].cantEjes = 2;
             }
-        nAuto++; //dos vehiculos
-        masDosEjes = 1; //uno tiene mas de dos ejes
-        /**/
+        if (dataLogger[nAuto].cantEjes > 2){
+            masDosEjes++;
+        };
+        nAuto++; 
     }
 }
 
@@ -128,10 +129,8 @@ void agregarDatos(){
 }
 
 /*---------------------------------------------------------------------
-  Function Name: calcularChecksum
-  Description:   calcula el checksum
-  Precondiciones: cant = C; mensaje[0..C]
-  Poscondiciones: checksum = acumulador = A; return A;
+  Function:     calcularChecksum
+  Descripcion:  calcula el checksum
 -----------------------------------------------------------------------*/
 unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
     unsigned int checksum =0;
@@ -156,7 +155,6 @@ unsigned int calcularChecksum(unsigned int Qty, unsigned int mensaje[]){
 /*---------------------------------------------------------------------
   Function Name: verificarMensaje
   Description:   verifica el mensaje recibido
-  msEnviar = MS; return MS; MS puede ser(41,42,43,44,45,46 o 47 si hay algun tipo de error)
 -----------------------------------------------------------------------*/
 void verificarMensaje(){
     unsigned int check,valor,Qty;
@@ -167,7 +165,7 @@ void verificarMensaje(){
     valor = valor << 8;//Desplaza 8 hacia izquierda; ejemplo:0x0081 quedaria 0x8100
     valor = valor + bufferRX[Qty - 1]; //sumamos parte alta mas parte baja; ejemplo: 0x8000 + 0x004B = 0x084B
     if ((check == valor) && (bufferRX[2] == 0x0003))
-    {//Verifico que el Checksum y el destinatario "03" coicidadan
+    {//Verifico que el Checksum y el emisor "03" coicidadan
         msEnviar =  bufferRX[5]; //Si es correcto enviamos el argumento
     } else {
         msEnviar = 0x0047;//si no enviamos NACK MENSAJE ERRONEO
@@ -188,7 +186,7 @@ void armarMensajeD() {
 
     while(i < nAuto){
     	if(bufferRX[6] == dataLogger[i].hora) //Si la hora correponsde a la solicitada cargo bufferTX con los datos a enviar
-        {
+        {//FE 00 02 03 80 44 11 09 16 
             bufferTX[6+j] = dataLogger[i].hora;
             bufferTX[7+j] = dataLogger[i].minutos;
             bufferTX[8+j] = dataLogger[i].segundos;
@@ -219,8 +217,6 @@ void armarMensajeD() {
 /*---------------------------------------------------------------------
   Function Name: armarMensaje
   Description:   arma el mensaje a transmitir
-  Precondiciones: cant = C; msEnviar = MS;
-  Poscondiciones: mensajeTransmicion = MT; MT[0..C]
 -----------------------------------------------------------------------*/
 void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
     unsigned int chsl,chsh= 0;
@@ -255,10 +251,7 @@ void armarMensaje( unsigned int Qty , unsigned int msEnviar) {
 /*---------------------------------------------------------------------
   Function Name: encenderCamara
   Description:   enciende camara por un milisegundo y la apaga
-  Precondiciones: --
-  Poscondiciones: --
 -----------------------------------------------------------------------*/
-
 void encenderCamara(){
     //unsigned int k=0;
     PORTAbits.RA3 = 1;
@@ -271,8 +264,6 @@ void encenderCamara(){
 /*---------------------------------------------------------------------
   Function Name: resetear
   Description:   Resetea la cantidad de veh�culos a 0 y borrar todos los registros.
-  Precondiciones: --
-  Poscondiciones: --
 -----------------------------------------------------------------------*/
 void resetear(){
     unsigned int i = 0;
@@ -290,8 +281,6 @@ void resetear(){
 /*---------------------------------------------------------------------
   Function Name: procesarMensaje
   Description:   procesa el mensaje y segun el caso ejecuta una funcion
-  Precondiciones: msEnviar = MS; MS (41..47)
-  Poscondiciones: --
 -----------------------------------------------------------------------*/
 void procesarMensaje(){
     switch(msEnviar) {
@@ -300,20 +289,20 @@ void procesarMensaje(){
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'B': 
-            resetear();//Resetear la cantidad de vehículos a 0 y borrar todos los registros.
+            resetear();//Resetear la cantidad de vehiculos a 0 y borrar todos los registros.
             armarMensaje(8,46);//ACK
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'C': 
-            armarMensaje(9,masDosEjes);//Consultar cantidad de vehículos con más de dos ejes.
+            armarMensaje(9,masDosEjes);//Consultar cantidad de vehiculos con mas de dos ejes.
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'D': 
-            armarMensajeD();//Consulta detallada de vehículos que pasaron en una determinada hora.
+            armarMensajeD();//Consulta detallada de vehiculos que pasaron en una determinada hora.
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
         case 'E': 
-            encenderCamara();//Accionar la cámara fotográfica.
+            encenderCamara();//Accionar la camara fotografica.
             armarMensaje(8,46);//ACK
             IFS1bits.U2TXIF = 1; // Interrupt request has occurred
             break;
